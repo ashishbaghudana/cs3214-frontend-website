@@ -1,0 +1,25 @@
+<div>
+    <div class="row">
+        <div class="col-lg-12">
+            <h1>{{target}} Submissions for {{user}}</h1>
+            <div ng-if="identity.admin">
+                    <div class="panel panel-success">
+                        <h2 class="display-3">Submissions</h2>
+                        <table class="table table-hover">
+                            <tr><th scope="col"><label>View Submission</label></th><th>Time Submitted</th></tr>
+                            <tbody>
+                            <tr ng-repeat="submission in submissions | orderBy: '-lastmodified' |limitTo:5:(currentPage-1)*5">
+                                <td scope="col"><a ui-sref="viewSubmission({user: '{{user}}', target: '{{target}}', uuid: '{{submission.uuid}}'})">{{submission.lastmodified | date: 'medium'}}</a></td>
+                                <td scope="col">{{moment.duration(moment(duedate).diff(submission.lastmodified)).humanize()}}<ng-container ng-if="moment(duedate).diff(submission.lastmodified) >= 0"> early</ng-container> <ng-container ng-if="moment(duedate).diff(submission.lastmodified) < 0"> late</ng-container></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <uib-pagination total-items="submissions.length" ng-model="currentPage" items-per-page="5"></uib-pagination>
+                    </div>
+            </div>
+            <div ng-if="!identity.admin">
+                <p>You are not an admin. This page cannot be shown.</p>
+            </div>
+        </div>
+    </div>
+</div>

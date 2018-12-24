@@ -1,0 +1,159 @@
+<div ng-controller="GraderController">
+    <div class="row">
+        <div class="col-lg-12">
+            <h1>{{target}} Grade for {{user}}</h1>
+            <a ng-if="submission.uuid" ng-href="{{downloadLink}}" download>Download submission</a>
+            <div ng-if="identity.admin">
+                <label class="btn btn-primary">
+                    <input autocomplete="off" type="checkbox" ng-model="error" ng-change="errorCheck()"> Choose New Submission Base
+                </label>
+                <div ng-if="error">
+                    <h1>Select one of the student's submissions as a base for grading.</h1>
+                    <div class="panel panel-success">
+                        <h2 class="display-3">Submissions</h2>
+                        <table class="table table-hover">
+                            <tr><th scope="col"><label>View Submission</label></th><th>Time Submitted</th><th scope="col">Select Submission as Grade Base</th></tr>
+                            <tbody>
+                            <tr ng-repeat="submission in submissions | orderBy: '-lastmodified' |limitTo:5:(currentPage-1)*5">
+                                <td scope="col"><a target="_blank" ui-sref="viewSubmission({user: '{{user}}', target: '{{target}}', uuid: '{{submission.uuid}}'})">{{submission.lastmodified | date: 'medium'}}</a></td>
+                                <td scope="col">{{moment.duration(moment(duedate).diff(submission.lastmodified)).humanize()}}<ng-container ng-if="moment(duedate).diff(submission.lastmodified) >= 0"> early</ng-container> <ng-container ng-if="moment(duedate).diff(submission.lastmodified) < 0"> late</ng-container></td>
+                                <td scope="col"><button type="button" ng-click="selectSubmission(submission)">Select Submission</button></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <uib-pagination total-items="submissions.length" ng-model="currentPage" items-per-page="5"></uib-pagination>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row" ng-if="submission">
+                <div class="col-lg-9">
+                    <div ng-if="submission.result.grade">
+                        <div>
+                            <details open>
+                                <summary>
+                                    <h2>GRADE</h2>
+                                </summary>
+                                <table ng-if="submission.result.grade.points" class="table table-hover">
+                                    <thead>
+                                        <tr class="primary">
+                                            <th class="scope">ID</th>
+                                            <th>Description</th>
+                                            <th>Points</th>
+                                            <th>Max</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="(key, points) in submission.result.grade.points">
+                                            <td>{{key}}</td>
+                                            <td>{{points.description}}</td>
+                                            <td>{{points.value}}</td>
+                                            <td>{{points.max}}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Total</th>
+                                            <th></th>
+                                            <th>{{pointTotal()}}</th>
+                                            <th>{{pointMax()}}</th>
+
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <div ng-if="submission.result.grade.comments">
+                                  <h2>Comments:</h2>
+                                  <pre>{{submission.result.grade.comments}}</pre>
+                                </div>
+                                <!--pre>{{submission.result.grade | json}}</pre-->
+                            </details>
+                        </div>
+                        <pre ng-if="submission.result.grade.message">{{submission.result.grade.message}}</pre>
+                    </div>
+                    <h2 ng-if="submission.result.grade.files">Relevant files in the submission for manual grading:</h2>
+                    <ul ng-repeat="file in submission.result.grade.files">
+                        <li>
+                            <h3>File: {{file.name}}</h3>
+                            <pre style="white-space: pre-wrap; font-family:monospace;">{{file.contents}}</pre>
+                        </li>
+
+                    </ul>
+                    <div ng-if="submission.result.run">
+                        <div>
+                            <details ng-open="!submission.result.grade">
+                                <summary>
+                                    <h2>EXECUTION</h2>
+                                </summary>
+                                <pre>{{submission.result.run}}</pre>
+                            </details>
+                        </div>
+                    </div>
+                    <div ng-if="submission.result.build">
+                        <div>
+                            <details ng-open="!submission.result.grade && !submission.result.run">
+                                <summary>
+                                    <h2>BUILD</h2>
+                                </summary>
+                                <pre>{{submission.result.build}}</pre>
+                            </details>
+                        </div>
+                    </div>
+                    <div ng-if="submission.result.extract">
+                        <div>
+                            <details
+                                    ng-open="!submission.result.grade && !submission.result.run && !submission.result.build">
+                                <summary>
+                                    <h2>EXTRACT</h2>
+                                </summary>
+                                <pre>{{submission.result.extract}}</pre>
+                            </details>
+                        </div>
+                    </div>
+                    <div>
+                        <details>
+                            <summary>
+                                <h2>Result</h2>
+                            </summary>
+                            <pre>{{submission.result.grade | json}}</pre>
+                        </details>
+                    </div>
+                </div>
+
+                <div class="col-lg-3" ng-if="submission.result.grade.points">
+                    <div bs-affix>
+                        <form ng-submit="submit(submission)">
+                            <div ng-repeat="(key, points) in submission.result.grade.points">
+                                <label>{{key}}: {{points.description}} <input ng-readonly="!identity.admin"
+                                                                              type="number"
+                                                                              ng-model="points.value" min={{points.min}}
+                                                                              max="{{points.max}}"/> out of {{points.max}}</label>
+                            </div>
+                            <div>
+                                <label>Grader Comments:</label>
+                                <textarea ng-readonly="!identity.admin"  ng-model="submission.result.grade.comments"></textarea>
+                            </div>
+
+                            <label>Current Total: {{ pointTotal() }}</label>
+
+                            <input ng-if="identity.admin" type="submit" value="Submit Grades">
+
+                            <div>
+                                <label ng-if="findPartner(submission)"> Submit to partner {{findPartner(submission)}} <input type="checkbox" ng-model="submitToPartner.value"></label>
+                            </div>
+                            <div ng-if="submissionResult">
+                                {{submissionResult}}
+                            </div>
+                        </form>
+
+                    </div>
+                </div>
+                <div class="col-lg-3" ng-if="!submission.result.grade.points">
+                    <div class="alert alert-danger" role="alert">
+                        Could not grade submission. See autograder output for details.
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+
+    </div>
+</div>

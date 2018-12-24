@@ -1,0 +1,51 @@
+This project stores the frontend for the systems website and is based off the autograder frontend.
+
+To publish the website run:
+
+    `npm install`
+    `npm run build`
+
+
+This will generate all of the assets into the dist folder that can be served by a webserver.
+
+
+DEPLOYMENT:
+  copy the files from dist to the specified directory in /web/courses/cs3214/
+
+
+
+Website-setup:
+    There are 2 places that the frontend is configured, in src/config and semester specific configuration in a json file
+    that is specified in src/config as semester_based_config.
+    For a normal semester configuration only the semester specific json file needs to be changed.
+
+    Place syllabus in src/documents/CS3214-Syllabus.pdf  or change the syllabus url in the config
+    Add the staff see entry of Eric Williamson as an example.
+
+    Specific steps can be found in SEMESTER_SETUP.md
+
+
+
+Adding Lectures:
+    Uncomment/Add in a entry to the lectures the semester based config. Place the referenced lecture files in src/lectures
+        They will be copied to the dist.
+
+
+Exercises:
+    For all exercises change the Due date in the project target.
+
+    Exercise 1:
+        Add in the project spec to src/exercises/exercise_files/ex1/ex1.pdf
+
+    Exercise 2:
+        Add in the exercise spec to src/exercises/exercise_files/ex2/ex2.pdf
+          Add in the relevant files for the spec to src/exercises/exercise_files/ex2
+            This includes:
+              linker sample inputs link0, link1
+              pie.c source
+
+
+Projects:
+    For all projects change the due date in project target.
+    Project 1:
+        Add in the project spec to src/projects/project_files/esh-handout.pdf

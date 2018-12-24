@@ -1,0 +1,47 @@
+<div class="row">
+    <div class="col-lg-12">
+        <h2>Exercise 2</h2>
+
+        <p>Please read the
+            <a ng-href="{{frontendConfig.exercisepath}}/ex2/ex2.pdf">Handout.</a>
+        </p>
+        <p>The sample input/output files are available in <a href="{{frontendConfig.exercisepath}}/ex2/">{{frontendConfig.hostpath}}/exercises/ex2</a>
+        </p>
+
+        <div class="col-lg-10">
+            <faq faq-heading="Linking Exercise FAQ">
+                <uib-accordion close-others="oneAtATime">
+                    <uib-accordion-group in-faq heading="How do we submit the program for part 1?">
+                        <p><b>Submission note:</b> The TAs ask that your program for problem 1 be named
+                            linker.x where .x is the suffix corresponding to your programming language,
+                            e.g., .py, .java, .cc, .c, ...
+                        </p>
+                    </uib-accordion-group>
+                    <uib-accordion-group in-faq heading="What do question 2.2 and 2.3 refer to?">
+                        They refer to the link command that was issued by make in part 2.1
+                    </uib-accordion-group>
+                    <uib-accordion-group in-faq heading="Do the provided samples for question 1 cover all cases?">
+                        Not necessarily.
+                        You should ensure that all cases are covered - use gcc and nm to produce your own.
+                    </uib-accordion-group>
+                    <!-- NOT LONGER USED IN THIS EXERCISE. uib-accordion-group in-faq heading="Can you give a hint for question 3?">
+                        Write a program to find the answer.
+                    </uib-accordion-group-->
+                    <uib-accordion-group in-faq heading="Does the order in which symbols appear in the output matter?">
+                        <p> Yes,
+
+                            Though a linker is technically able to produce multiple legal layouts, for the purposes of
+                            this exercise, you should produce the same order.
+                        </p>
+
+                        <p>
+                            That is, symbols should be laid out contiguously, and appear in the same relative order in
+                            the output and in the input file (that's the behavior of the default linker, so you can
+                            verify if your simulator does the same.)
+                        </p>
+                    </uib-accordion-group>
+                </uib-accordion>
+            </faq>
+        </div>
+    </div>
+</div>

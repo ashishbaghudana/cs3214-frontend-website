@@ -1,0 +1,10 @@
+<div>
+    <table class="table table-hover">
+        <tr><th scope="col"><label>Submission Targets</label></th></tr>
+        <tbody>
+            <tr ng-repeat="(target,v) in targets">
+                <td scope="col"><a ui-sref="allsumbissions({target: '{{target}}'})">{{target}} Submissions</a></td>
+            </tr>
+        </tbody>
+    </table>
+</div>

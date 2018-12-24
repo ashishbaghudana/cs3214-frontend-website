@@ -1,0 +1,129 @@
+<div class="row" ng-controller="OutfoxedExerciseController">
+    <div class="col-lg-12">
+        <h2>Exercise 3: Outfoxed!</h2>
+
+        <div class="col-lg-6">
+            <p>The game <a href="http://bit.ly/1QWKDzD">Outfoxed</a>
+                is a cooperative 'whodunit' deduction game for children 5 years or older.
+                In this exercise, you are asked to write a multi-threaded program that reproduces some
+                elements of this game. Since the game is for 5-year-olds, implementing the logic
+                should not be hard - but the multi-threaded aspect will require you to learn about
+                synchronization strategies between threads that may be useful for the second project!
+            </p>
+            <p>Your program will be in <code>outfoxed.c</code> (which you write), which will be linked with
+                <a href="{{frontendConfig.exercisepath}}/ex3/outfoxed-driver.c">outfoxed-driver.c</a> as described below.
+            </p>
+            <p>
+                When you are done, <a ui-sref="submissions">submit</a> a single file, outfoxed.c, as ex3!
+            </p>
+
+            <p ng-if="outfoxed.gamecode" class="text-info">
+                This exercise contains a component that is unique to each student.
+                Based on your pid (<span class="text-primary">{{outfoxed.pid}}</span>),
+                your unique game code is <span class="text-primary">{{outfoxed.gamecode}}</span>.
+                This means your program must decode clues in this order: <br>
+                <span class="text-primary">{{outfoxed.order}}</span></p>
+            <p>
+                Thus, you must run your outfoxed executable with
+            </p>
+            <pre>$ ./outfoxed {{outfoxed.gamecode}}</pre>
+
+            <p ng-if="outfoxed.error" class="alert alert-danger">
+                Could not retrieve game code. Error: {{outfoxed.error}}
+                Please contact staff.
+            </p>
+            <p>A driver script that will be used for grading is available in ~cs3214/bin/checkoutfoxed.py.
+                Run with:
+            </p>
+            <pre>$ checkoutfoxed.py {{outfoxed.gamecode}}</pre>
+            <div class="alert alert-info"><b>Update:</b> The driver script is designed to perform
+                thorough testing to catch mistakes. It will run your solution on a single CPU in order to
+                test whether your code uses busy-waiting, and flag it if so.
+                In addition, it will vary the number of CPUs on which the code is run to make it more
+                likely for latent race conditions or order violations to manifest themselves.
+            </div>
+            <p>There is no separate handout for this project. Read the source of outfoxed.h
+                below first. For additional instructions, please read
+                the FAQ appended below.</p>
+        </div>
+        <div class="col-lg-6">
+            <div style="width: 600px; height: 600px;">
+                <a href="images/outfoxedr.jpg">
+                    <img style="width: 800px; height: 600px; margin: 0 0 0 -80px; clip: rect(10px,660px,580px,100px); position: absolute;"
+                         src="images/outfoxedr.jpg">
+                </a>
+            </div>
+            <i>This photograph shows the copy of the game that is owned by me.
+                <br>
+                All artwork is copyright GameWright, Inc.</i>
+        </div>
+
+        <div style="clear:both;">
+            <p>This listing of <a href="{{frontendConfig.exercisepath}}/ex3/outfoxed.h">outfoxed.h</a> describes how the game works.</p>
+        </div>
+        <div class="col-lg-11" style="clear: both;" include="'exercises/ex3/outfoxed.h'" hljs language="c">
+        </div>
+
+        <div class="col-lg-10">
+            <faq faq-heading="Exercise FAQ">
+                <uib-accordion close-others="oneAtATime">
+                    <uib-accordion-group in-faq heading="Is the driver code thread-safe?">
+                        <b>No!</b> Results will be undefined if, for instance, multiple chicken
+                        detectives try to eliminate suspects at the same time. It is your responsibility
+                        to prevent this.
+                    </uib-accordion-group>
+
+                    <uib-accordion-group in-faq heading="Can we change the driver code?">
+                        Only for your own testing debugging, not for grading.
+                    </uib-accordion-group>
+
+                    <uib-accordion-group in-faq
+                                         heading="How can I see more information about the events occurring in the game?">
+                        Set the environment variable <code>VERBOSE</code> to 1, i.e., run with
+                        <pre>
+env VERBOSE=1 ./outfoxed {{outfoxed.gamecode}}</pre>
+                    </uib-accordion-group>
+
+                    <uib-accordion-group in-faq heading="If my program sometimes works, how will this be graded?">
+                        Errors in multi-threaded code can be intermittent, which is why we run your program multiple
+                        times.
+                        Each run comprises 50 games. The program will abort() whenever an error occurs.
+                        The presence of even a single failed run indicates a serious error.
+                        Thus, our grading scale will award full credit for successfully completing all runs,
+                        and 60% or less partial credit if some runs fail.
+                    </uib-accordion-group>
+
+                    <uib-accordion-group in-faq heading="What tools can I use to help me debug?">
+                        <p><a href="http://valgrind.org/docs/manual/hg-manual.html">Helgrind</a> and
+                            <a href="http://valgrind.org/docs/manual/drd-manual.html">DRD</a> are two race-condition
+                            checkers installed on the rlogin machines.
+                            To use them, run your program with
+                        <pre>valgrind --tool=drd ./outfoxed {{outfoxed.gamecode}}</pre>
+                        or
+                        <pre>valgrind --tool=helgrind ./outfoxed {{outfoxed.gamecode}}</pre>
+                        </p>
+                        <p>A third (and faster) tool is <a href="http://clang.llvm.org/docs/ThreadSanitizer.html">Google
+                            Thread Sanitizer</a>. To use it, you must compile your program with the <a
+                                href="http://clang.llvm.org/">clang</a> compiler and the
+                            <code>-fsanitize=thread</code> flag.
+                        </p>
+                        <pre>clang -fsanitize=thread outfoxed-driver.c outfoxed.c -o outfoxed-clang
+./outfoxed-clang {{outfoxed.gamecode}}</pre>
+
+                    </uib-accordion-group>
+
+                    <uib-accordion-group in-faq heading="How do I test my program on a single CPU?">
+                        Use the <tt><a href="http://linux.die.net/man/1/taskset">taskset</a></tt> command which
+                        allows you to restrict the CPUs on which a
+                        program's threads are eligible to run.
+                    </uib-accordion-group>
+
+                    <uib-accordion-group in-faq heading="Do we have to wear detective hats while doing this exercise?">
+                        Wearing detective hats is optional.
+                    </uib-accordion-group>
+
+                </uib-accordion>
+            </faq>
+        </div>
+    </div>
+</div>

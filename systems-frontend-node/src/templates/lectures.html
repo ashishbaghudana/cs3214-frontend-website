@@ -1,0 +1,23 @@
+<div class="row">
+    <div class="col-lg-12">
+        <h2>Lecture Notes</h2>
+        <table class="table">
+            <tr>
+                <th>Title</th>
+                <th colspan="2">Slides</th>
+                <th>Reading</th>
+            </tr>
+            <!-- improve: http://stackoverflow.com/questions/11873570/angularjs-for-loop-with-numbers-ranges -->
+            <tr ng-repeat="lecture in frontendConfig.lectures">
+                <td>{{lecture.desc}}</td>
+                <td><a ng-href="{{frontendConfig.lecturepath}}{{lecture.urlpdf}}">PDF</a></td>
+                <td><a ng-if="lecture.urlpptx" ng-href="{{frontendConfig.lecturepath}}{{lecture.urlpptx}}">PPTX</a></td>
+                <td>{{lecture.reading}}</td>
+            </tr>
+        </table>
+        <p>Lecture notes will be posted at or after each lecture, they are grouped by topics which
+            may encompass multiple lectures.  The posted notes may be updated before each lecture, so be
+            sure to check for the current version before class.  Lecture will not necessarily cover all of them, but you are
+            responsible for their content for the purposes of the exam.</p>
+    </div>
+</div>

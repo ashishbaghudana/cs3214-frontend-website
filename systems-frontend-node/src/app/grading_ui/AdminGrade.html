@@ -1,0 +1,10 @@
+<div ng-controller="AdminGradeLandingController">
+    <table class="table table-hover">
+        <tr><th scope="col"><label>Gradable Targets</label></th></tr>
+        <tbody>
+            <tr ng-repeat="(target,v) in targets">
+                <td scope="col"><a ui-sref="allgrades({target: '{{target}}'})">{{target}} Grades</a></td>
+            </tr>
+        </tbody>
+    </table>
+</div>

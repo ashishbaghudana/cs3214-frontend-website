@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="<%= htmlWebpackPlugin.options.ngApp || 'app' %>"
+        <% if(htmlWebpackPlugin.files.manifest) { %>
+      manifest="<%= htmlWebpackPlugin.files.manifest %>"
+        <% } %>
+>
+<head>
+    <script>
+        if (window.location.protocol != "https:")
+            window.location.href = "https:" +
+                window.location.href.substring(window.location.protocol.length);
+    </script>
+    <meta charset="utf-8">
+    <title><%= htmlWebpackPlugin.options.title || 'Webpack App' %></title>
+
+    <% if (htmlWebpackPlugin.options.favicon) { %>
+    <link rel="shortcut icon" href="<%= htmlWebpackPlugin.options.favicon %>">
+    <% } %>
+
+    <% if (htmlWebpackPlugin.options.mobile) { %>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <% } %>
+
+    <% if (htmlWebpackPlugin.options.baseHref) { %>
+    <base href="<%= htmlWebpackPlugin.options.baseHref %>">
+    <% } %>
+
+
+</head>
+
+<body ng-cloak ng-controller="PageController">
+<header  ng-controller="NavController" class="navbar navbar-inverse navbar-static-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" ui-sref="home">{{frontendConfig.fullname}} - {{frontendConfig.semester}}</a>
+        </div>
+        <nav class="navbar-collapse collapse">
+            <ul class="navbar-nav nav">
+                <li ng-repeat="item in frontendConfig.nav_targets.topbar"
+                    ng-class="{ active : location.path() == item.path }"><a href="#!{{item.path}}">{{item.label}}</a>
+                </li>
+                <li ng-repeat="dropdown in frontendConfig.nav_targets.dropdowns"
+                    ng-if="!dropdown.needauthentication || identity.admin || identity && !dropdown.adminonly"
+                    class="dropdown">
+                    <a class="dropdown-toggle" data-toggle="dropdown" role="button">{{dropdown.label}}<b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                        <li ng-repeat="item in dropdown.entries"><a
+                                    href="#!{{item.path}}">{{item.label}}</a></li>
+                    </ul>
+                </li>
+            </ul>
+            <ul class="navbar-nav nav navbar-right">
+                <li ng-hide="identity">
+                    <a href="#!/login">Login</a>
+                </li>
+                <li ng-show="identity">
+                    <a href="#!/logout">Logout ({{auth_user_name}})</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</header>
+<div ng-view class="container-fluid">
+    <ui-view></ui-view>
+</div>
+</body>
+</html>

@@ -1,0 +1,74 @@
+<div class="row" ng-controller="StudentPluginController">
+    <div class="col-lg-12">
+        <h2>Submitted Student Plugins</h2>
+        <!--
+        <p class="alert alert-danger">Under construction until this line is removed.</p>
+        -->
+        <p>
+            A reminder: please do not publish the source code of your plug-in,
+            just the .so file.
+        </p>
+        <p>To be listed (and be accessible to other students) your plugin must be world-readable
+            and all directories must be world-executable.
+        </p>
+        <p>Follow <a href="http://courses.cs.vt.edu/cs3214/projects/student-plugins/gback/glob/gback_glob_test.py">this example</a>
+            of how to write a test for your plugin.</p>
+        <p>To load another group's plugin in your shell, simply do
+        <pre>
+./esh -p /web/courses/cs3214/spring2016/projects/student-plugins/gback/glob
+</pre>
+        (substituting the Path given in the table below.)
+        </p>
+        <p>To run the formal tests of another group's plugin, follow these steps:</p>
+        <pre>
+# verify you are in the directory that contains your esh and eshoutput.py
+ln -s /web/courses/cs3214/projects/student-plugins .
+</pre>
+
+        <p>Then, create a file <code>plugin.tst</code> with this content:
+        <pre>
+= Plugins Tests
+1 student-plugins/gback/glob/gback_glob_test.py
+</pre>
+        and run:
+        <pre>
+stdriver.py -p student-plugins/gback/glob plugin.tst
+</pre>
+        (you may add multiple lines to your plugin.tst file, but don't forget to add additional
+        -p directories. <i>Note: currently, the directory specified to -p must be a relative path</i>)
+        </p>
+
+        <p>Alternatively, you can run the test script directly so:
+        <pre>
+student-plugins/gback/glob/gback_glob_test.py eshoutput.py " -p student-plugins/gback/glob"
+</pre>
+        (be careful to reproduce the exact spacing)
+        </p>
+        <p class="alert alert-warning">Below, if you see anything missing or in red, this means that the plugin was not properly copied
+            into the student-plugins directory.  If this is your plug-in, please correct it (you're the only one who
+            can do that.)
+        </p>
+        <p class="alert alert-danger" ng-if="plugins.status == 0">
+            Could not retrieve list of plug-ins, error: {{plugins.error}}
+        </p>
+        <table class="table" ng-if="plugins.status == 1">
+            <tr>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Test</th>
+                <th>-p Path</th>
+                <th>Authors</th>
+                <th>Last Modified</th>
+            </tr>
+            <tr ng-repeat="plugin in plugins.list | orderBy: 'name'">
+                <td colspan="6" ng-if="plugin.status == 0" class="alert alert-danger">{{plugin.errormsg}}</td>
+                <td ng-if="plugin.status == 1">{{plugin.name}}</td>
+                <td ng-if="plugin.status == 1"><a ng-href="http://courses.cs.vt.edu/cs3214/{{plugin.descurl}}">[Desc]</a></td>
+                <td ng-if="plugin.status == 1"><a ng-href="http://courses.cs.vt.edu/cs3214/{{plugin.testurl}}">[Test]</a></td>
+                <td ng-if="plugin.status == 1">{{plugin.hostpath}}</td>
+                <td ng-if="plugin.status == 1">{{plugin.authors}}</td>
+                <td ng-if="plugin.status == 1">{{plugin.lastmtime | date: 'short'}}</td>
+            </tr>
+        </table>
+    </div>
+</div>

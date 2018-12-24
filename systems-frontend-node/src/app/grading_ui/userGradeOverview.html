@@ -1,0 +1,94 @@
+<div class="row">
+    <div class="col-lg-12">
+        <!--
+            <p class="alert alert-danger">Under construction while this sign is displaying.</p>
+        -->
+        <h2>Grades for {{user}}</h2>
+        <div ng-if="error">
+            <p class="alert alert-danger">Error: {{error.data.message}}</p>
+        </div>
+        <div ng-if="grades">
+            <table class="table">
+                <tr>
+                    <th style="width: 30%;">Grades</th>
+                    <th ng-repeat="g in grades | orderObjectBy: 'id'">
+                      <a ng-href="histograms/{{g.id}}.png">{{g.id}}</span>
+                    </th>
+                </tr>
+                <tr>
+                    <td>Grade File</td>
+                    <td ng-repeat="g in grades | orderObjectBy: 'id'">
+                        <a ui-sref="gradeSubmission({user: '{{user}}', target: '{{g.id}}'})">{{g.total}}</a>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Late Days</td>
+                    <td ng-repeat="g in grades | orderObjectBy: 'id'">
+                      <div ng-if="g.grade.latedays">{{g.grade.latedays}}</div>
+                      <div ng-if=!g.grade.latedays>0</div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Minimum Requirements Met?</td>
+                    <td ng-repeat="g in grades | orderObjectBy: 'id'" class="alert">
+                        <span ng-if="g.grade.result.grade.min_req !== undefined && g.grade.result.grade.min_req" class="glyphicon glyphicon-ok-circle alert-success">
+                        </span>
+                        <span ng-if="g.grade.result.grade.min_req !== undefined && !g.grade.result.grade.min_req" class="glyphicon glyphicon-remove-circle alert-danger"
+                              title="Minimum Requirements were not met.  Resubmit before the end of the semester to avoid grade cap.">
+                        </span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Possible</td>
+                    <td ng-repeat="g in grades | orderObjectBy: 'id'">{{g.max}}</td>
+                </tr>
+            </table>
+        </div>
+
+        <div ng-if="exams.midterm">
+            <h4>Midterm Exam Score</h4>
+            <table class="table">
+                <tr>
+                    <th style="width: 30%;">Question</th>
+                    <th ng-repeat="g in (['Q1','Q2','Q3','Q4','Q5','Q6','Q7'] | limitTo:exams.midterm.problems.length)">
+                        {{g}}
+                    </th>
+                    <th>Total</th>
+                </tr>
+                <tr>
+                    <td>Points (<a ng-href="{{config.exams.midterm.solurl}}">Solutions</a>)</td>
+                    <td ng-repeat="s in exams.midterm.problems track by $index" ng-bind="s"></td>
+                    <td>{{exams.midterm.score}}</td>
+                </tr>
+            </table>
+        </div>
+        <div ng-if="exams.final">
+            <h4>Final Exam Score</h4>
+            <table class="table">
+                <tr>
+                    <th style="width: 30%;">Question</th>
+                    <th ng-repeat="g in (['Q1','Q2','Q3','Q4','Q5','Q6','Q7'] | limitTo:exams.final.problems.length)">
+                        {{g}}
+                    </th>
+                    <th>Total</th>
+                </tr>
+                <tr>
+                    <td>Points (<a ng-href="{{config.exams.final.solurl}}">Solutions</a>)</td>
+                    <td ng-repeat="s in exams.final.problems track by $index" ng-bind="s"></td>
+                    <td>{{exams.final.score}}</td>
+                </tr>
+            </table>
+        </div>
+        <div ng-if="exams.letter">
+            <h4>Final Letter Grade</h4>
+            <div class="alert alert-success">
+                <p class="text-center">
+                    <b>{{exams.letter}}</b>
+                </p>
+            </div>
+            <p class="text-center">
+                <small><a ng-href="{{config.finallettergrades}}">(Class Distribution)</a></small>
+            </p>
+        </div>
+    </div>
+</div>

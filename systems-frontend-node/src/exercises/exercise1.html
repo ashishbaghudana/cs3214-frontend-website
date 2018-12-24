@@ -1,0 +1,70 @@
+<div class="row" ng-controller="Exercise1Controller">
+    <div class="col-lg-12">
+        <h2>Exercise 1</h2>
+
+        <p>Please read the
+            <a ng-href="{{frontendConfig.exercisepath}}/ex1/ex1.pdf">Handout</a>
+            (large version of <a ng-href="{{frontendConfig.exercisepath}}/ex1/ex1dpipefigure.pdf">Figure 1</a>)
+        </p>
+
+        <p>Each student will reverse engineer their own unique version of dpipe.
+            Please make sure you reverse engineer your version. Your answers will differ from those
+            of your fellow students. There are over 300,000 unique ways (primarily because
+            some of the system calls involved can be issued in any order, creating numerous
+            possible combinations).</p>
+        <p>For pid <span class="text-primary">{{exercise1.pid}}</span>, your unique version is located
+            in <span class="text-primary">~cs3214/bin/dpipe.variants/dpipe-{{exercise1.dpipeid}}</span> on rlogin.
+        </p>
+
+        <div class="col-lg-10">
+            <faq faq-heading="Exercise 1 FAQ">
+                <uib-accordion close-others="oneAtATime">
+                    <uib-accordion-group in-faq heading="Why can I not see my dpipe process using 'ps ax'?">
+                        <i>.... or using 'ps -e'?</i>
+                        <p>Either because you're running ps on a different machine than the dpipe process, or because
+                            dpipe isn't running anymore when you run ps.
+                        </p>
+                        <p>To exclude the former, run 'hostname' on your prompt, or better, equip yourself
+                            with a <a
+                                    href="https://www.google.com/webhp?sourceid=chrome-instant&ion=1&espv=2&ie=UTF-8#q=useful%20bash%20prompts">useful
+                                bash prompt</a> that includes the hostname.</p>
+                        <p>To exclude the latter, make sure that the shell has not returned to the prompt. See next
+                            question.</p>
+                    </uib-accordion-group>
+
+                    <uib-accordion-group in-faq
+                                         heading="Why does 'dpipe wc gnetcat -l ...' return to the prompt right away?">
+                        <p>Likely because you do not have <tt>~cs3214/bin</tt> in your <tt>PATH</tt>.
+                            In this case, dpipe's attempt to exec("gnetcat") will fail, but unlike a proper shell, dpipe
+                            will silently ignore that error and exit. You get the shell prompt back in this case.</p>
+                    </uib-accordion-group>
+
+                    <uib-accordion-group in-faq heading="I'm getting 'Permission Denied' when looking in /proc/<nnnn>.">
+                        <p>You are looking either on the wrong machine's <tt>/proc</tt> directory or you are looking
+                            under the wrong pid -
+                            perhaps the pid of a dpipe process run by another student on the same machine.</p>
+                        <p>The /proc file system provides information about all processes running on a machine. Some of
+                            this
+                            information is accessible to all users, some of it is accessible to only to the user that
+                            owns a process,
+                            and all of it is accessible to the superuser.
+                        </p>
+                        <p><a href="https://en.wikipedia.org/wiki/File_system_permissions#Traditional_Unix_permissions">Traditional
+                            Unix permissions</a>
+                            are used to control this access. Use <tt>ls -l</tt> to verify you are looking at the correct
+                            files/directories.
+                        </p>
+                    </uib-accordion-group>
+                    <uib-accordion-group in-faq heading="What are the arguments to my dpipe?">
+                        <p>The first argument is the name of the first program. The second argument is the name of the
+                            second program. All arguments
+                            after that are arguments to the second program. Do not make any assumptions about the number
+                            of arguments given. Doing so may
+                            cause you to fail the test scripts.
+                        </p>
+                    </uib-accordion-group>
+                </uib-accordion>
+            </faq>
+        </div>
+    </div>
+</div>

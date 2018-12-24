@@ -1,0 +1,22 @@
+<div class="row">
+    <div class="col-lg-12">
+        <h2>Documents</h2>
+        <p><a ng-href="{{frontendConfig.syllabus}}">Syllabus</a></p>
+
+        <h4>Exams</h4>
+        <table class="table">
+            <tr ng-repeat="exam in frontendConfig.exams">
+                <td><a ng-href="{{exam.annurl}}">{{exam.announcement}}</a></td>
+                <td><a ng-href="{{exam.solurl}}">Solutions</a></td>
+            </tr>
+        </table>
+
+        <h4>Sample Midterms</h4>
+        <table class="table">
+            <!-- improve: http://stackoverflow.com/questions/11873570/angularjs-for-loop-with-numbers-ranges -->
+            <tr ng-repeat="exam in frontendConfig.sampleexams">
+                <td><a ng-href="{{exam.url}}">{{exam.desc}}</a></td>
+            </tr>
+        </table>
+    </div>
+</div>
