@@ -13,15 +13,15 @@ import submissionFaq from '../templates/submissionfaq.html';
 
 
 // This is the path to the semester specific configuration
-import semester_based_config from "/home/courses/cs3214/admin/submissions/configurationFiles/spring2018.json";
+import semester_based_config from "/home/courses/cs3214/admin/submissions/configurationFiles/spring2019.json";
 
 // This is a default configuration to be used if semester_based_config does not have those values
 let frontent_config = {
     // this the base url for the autograder-queue api.
-    judgeapiurl: "https://courses.cs.vt.edu/cs3214/autograder_api/spring2018",
+    judgeapiurl: "https://courses.cs.vt.edu/cs3214/autograder_api/spring2019",
     auth: {
 
-        apiurl: "https://courses.cs.vt.edu/cs3214/autograder_api/spring2018",
+        apiurl: "https://courses.cs.vt.edu/cs3214/autograder_api/spring2019",
         /* multiple authentication options may be enabled. */
         password: {
         },

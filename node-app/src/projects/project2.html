@@ -74,7 +74,7 @@
 
                     <uib-accordion-group in-faq heading="Using _Thread_local does not work!">
                         <p>
-                            As of Spring 2018, /usr/bin/gcc refers to gcc 4.8.5 which indeed <a href="https://gcc.gnu.org/wiki/C11Status">does not support</a> the <code>_Thread_local</code> keyword.
+                            As of Spring 2016, /usr/bin/gcc refers to gcc 4.8.5 which indeed <a href="https://gcc.gnu.org/wiki/C11Status">does not support</a> the <code>_Thread_local</code> keyword.
                             Use <code>__thread</code> or use gcc 4.9.2, which you will have in your path if you run <code>scl enable devtoolset-3 bash</code>. (You need to repeat
                             that every time you log on.)
                         </p>

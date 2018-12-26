@@ -5,7 +5,7 @@
  * For grading, we will use exactly this copy.
  *
  * Written by Godmar Back <gback@cs.vt.edu> for CS 3214
- * Spring 2018
+ * Fall 2018
  */
 #include "outfoxed.h"
 

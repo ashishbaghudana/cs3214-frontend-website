@@ -1,6 +1,6 @@
 !/bin/sh
 
-SEMESTER=spring2018
+SEMESTER=spring2019
 PUBLISH_DIR=/web/courses/cs3214/$SEMESTER
 
 if [ ! -d "$PUBLISH_DIR" ]; then
