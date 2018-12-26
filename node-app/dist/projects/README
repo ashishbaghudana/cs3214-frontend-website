@@ -1,8 +1,0 @@
-This directory should have the projects cloned to be used as they are published.
-
-
-In addition the project specs should be placed in the base folder:
-    esh/p1 -> 'esh-handout.pdf'
-    threadpool/p2 -> 'threadpool-handout.pdf'
-    malloc/p3 -> 'malloclab-cs3214.pdf'
-    sysstatd -> 'sysstatwebservice-handout.pdf'
