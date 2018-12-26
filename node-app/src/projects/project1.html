@@ -612,7 +612,7 @@ the pid of the child process that caused SIGCHLD.  Why then can I not use it?">
                             However, since traditional Unix signals are not queued, si_pid for a SIGCHLD will contain
                             the pid of the first child that caused SIGCHLD to become pending.  Therefore, it cannot
                             be used to learn which children need to be reaped. You must use waitpid(-1, ...).
-                            Study <a href="/~cs3214/fall2010/gback/examples/signal/sigchlddoesnotqueue.c">sigchlddoesnotqueue.c</a>
+                            Study <a href="/~cs3214/spring2018/gback/examples/signal/sigchlddoesnotqueue.c">sigchlddoesnotqueue.c</a>
                             for an example.
                         </p>
                     </uib-accordion-group>

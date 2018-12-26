@@ -223,6 +223,9 @@ import userGradeOverviewHtml from './userGradeOverview.html';
                 let target = $stateParams.target;
                 $scope.target = target;
                 let pointGetTotal = function (submission) {
+                    if (submission.result.valid == false) {
+                        return 0;
+                    }
                     let points = submission.result.grade.points;
                     let total = 0;
                     for (let key in points){

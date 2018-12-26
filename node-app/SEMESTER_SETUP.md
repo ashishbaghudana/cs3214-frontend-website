@@ -8,7 +8,7 @@ Change the `judgeapiurl` and the `apiurl` urls to point to the new semester.
 These are found in src/config/config.js
 
 ## Create a new semester config file 
-ex. /home/courses/cs3214/admin/submissions/configurationFiles/fall2018.json
+ex. /home/courses/cs3214/admin/submissions/configurationFiles/spring2018.json
 
 This file will serve as the custom configuration for all of the semester specific configuration.
 

@@ -2,7 +2,7 @@
 #
 # Utility to run outfoxed exercise
 #
-# Written for CS3214 Spring 2016 by G. Back (godmar@gmail.com)
+# Written for CS3214 Spring 2018 by G. Back (godmar@gmail.com)
 #
 
 import re, os, sys, subprocess, operator, signal, resource, getopt

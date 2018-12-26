@@ -359,7 +359,10 @@ import login_template from '../templates/login.html';
                 });
             };
 
-            function addStateFromMenuItem(item, needsAuthentication) {
+            function addStateFromMenuItem(item, needsAuthentication, isEnabled) {
+                if (isEnabled !== undefined && isEnabled === false) {
+                    return;
+                }
                 let state_name = item.state || item.label.toLowerCase();    // fall back to Eric's hack
                 let state =  $stateRegistry.get(state_name);
                 if (!state) {
@@ -377,11 +380,11 @@ import login_template from '../templates/login.html';
 
             // add the routes for the menu items listed in config.
             config.nav_targets.topbar.forEach(function (item) {
-                addStateFromMenuItem(item, item.needauthentication);
+                addStateFromMenuItem(item, item.needauthentication, item.enabled);
             });
             config.nav_targets.dropdowns.forEach(function (dropdownmenu) {
                 dropdownmenu.entries.forEach(function (item) {
-                    addStateFromMenuItem(item, dropdownmenu.needauthentication || item.needauthentication);
+                    addStateFromMenuItem(item, dropdownmenu.needauthentication || item.needauthentication, item.enabled);
                 });
             });
         })
