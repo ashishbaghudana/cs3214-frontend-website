@@ -1,4 +1,4 @@
-!/bin/sh
+#!/bin/sh
 
 SEMESTER=spring2019
 PUBLISH_DIR=/web/courses/cs3214/$SEMESTER
