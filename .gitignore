@@ -1,0 +1,3 @@
+node-app/node_modules
+node-app/dist
+node-app/package-lock.json
