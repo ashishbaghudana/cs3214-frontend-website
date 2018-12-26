@@ -14,10 +14,10 @@ let exercise_config = {
                 label: "Exercises",
                 entries: [
                     {path: '/exercises', label: "Exercise Due Dates", templateUrl: exercises_html},
-                    {path: '/ex1', label: "Exercise 1", templateUrl: ex1_html, needauthentication: true},
-                    {path: '/ex2', label: "Exercise 2", templateUrl: ex2_html},
-                    {path: '/ex3', label: "Exercise 3", templateUrl: ex3_html, needauthentication: true},
-                    {path: '/ex4', label: "Exercise 4", templateUrl: ex4_html},
+                    {path: '/ex1', label: "Exercise 1", templateUrl: ex1_html, needauthentication: true, disabled: true},
+                    {path: '/ex2', label: "Exercise 2", templateUrl: ex2_html, disabled: true},
+                    {path: '/ex3', label: "Exercise 3", templateUrl: ex3_html, needauthentication: true, disabled: true},
+                    {path: '/ex4', label: "Exercise 4", templateUrl: ex4_html, disabled: true},
                 ]
             },
         ]

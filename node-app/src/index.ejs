@@ -50,7 +50,7 @@
                     class="dropdown">
                     <a class="dropdown-toggle" data-toggle="dropdown" role="button">{{dropdown.label}}<b class="caret"></b></a>
                     <ul class="dropdown-menu">
-                        <li ng-repeat="item in dropdown.entries"><a
+                        <li ng-repeat="item in dropdown.entries" ng-if="!item.disabled"><a
                                     href="#!{{item.path}}">{{item.label}}</a></li>
                     </ul>
                 </li>
