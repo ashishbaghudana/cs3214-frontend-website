@@ -17,8 +17,8 @@ def change_semester_in_files(semester, semester_long):
     for root, dirs, files in os.walk("."):
         for file_name in files:
             file = os.path.join(root, file_name)
-            if file in EXCLUDE_LIST:
-                continue
+            # if file in EXCLUDE_LIST:
+            #     continue
             try:
                 with open(file) as freader:
                     content = freader.read()
