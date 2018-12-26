@@ -1,0 +1,19 @@
+<div class="row" ng-controller="GrouperApp">
+    <div class="col-lg-12">
+        <h2>{{frontendConfig.shortname}} Grouper App Admin</h2>
+        <p>Remaining available students: {{grouper.available.length}}</p>
+        <p ng-if="grouper.available.length < 50">Emails: {{availableemails}}</p>
+        <table class="table table-condensed">
+            <tr>
+                <th>PID</th>
+                <th>Last, First</th>
+                <th>Partner</th>
+            </tr>
+            <tr ng-repeat="s in allstudents.pairs | orderBy: 'lastname'">
+                <td>{{s.pid}}</td>
+                <td>{{s.lastname}}, {{s.firstname}}</td>
+                <td>{{s.peer}} ({{printName(s.peer)}})</td>
+            </tr>
+        </table>
+    </div>
+</div>

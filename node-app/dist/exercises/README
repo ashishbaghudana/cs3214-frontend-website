@@ -1,0 +1,3 @@
+The files in this folder are copied to exercises in the dist folder.
+Any additional files should be added as subfolders/files of src/exercises/exercise_files to have them copied
+at deploy time

@@ -1,0 +1,12 @@
+<div class="row" ng-controller="AnaDynamicFileController">
+    <div class="col-lg-12">
+        <h2>
+            {{file}}
+        </h2>
+        <div ng-show="fileResult.result">
+            <pre id="src" ng-prism="c" ng-prism-data="{{fileResult.result}}" class="line-numbers"
+                 data-line="{{line}}"></pre>
+        </div>
+    </div>
+
+</div>

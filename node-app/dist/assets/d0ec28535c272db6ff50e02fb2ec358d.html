@@ -1,0 +1,44 @@
+<div class="row" ng-controller="VarsysPageController">
+    <div class="col-lg-12">
+        <h2> {{frontendConfig.shortname}} Variability Analysis Results</h2>
+        <div class="col-lg-12">
+            <p>This page shows the analysis results for {{jid}}.</p>
+            <p>The graphs may take a few seconds to load. Please be patient.</p>
+            <p>Any questions or comments can be directed to Pratik Anand at <a href="mailto:pratik@vt.edu">pratik@vt.edu</a>
+	    <p> Note : If the graph plots show an error, it is a visualization bug. Your data is safe and a server restart will fix it. Send a mail for that.</p>
+            </p>
+        </div>
+        <br>
+        <a href="cs3214/varsys/getanalysisfile/{{pid}}/{{id}}/runresults" class="btn btn-default"  data-toggle="tooltip" data-placement="bottom" title="Raw data produced by fjdriver benchmark">View run results</a>
+        <a href="cs3214/varsys/getanalysisfile/{{pid}}/{{id}}/analysisresults" class="btn btn-default" data-toggle="tooltip" data-placement="bottom" title="Processed data used to generate plots">View analysis results</a>
+        <hr style="clear: both" />
+        <p class="col-lg-12"> <b>Flags: </b> {{options.flags.join(", ")}}   </p>
+       <!-- <pre class="col-lg-12">Default options: {{options.defaults | json}}</pre> -->
+        <hr style="clear: both" />
+        <table class="table table-striped">
+            <thead>
+                <th>Option</th>
+                <th>Value</th>
+            </thead>
+            <tbody>
+               <tr ng-repeat="(o, v) in options.defaults">
+                  <td> <b> {{o}} </b></td>
+                  <td>{{v}}</td>
+               </tr>
+            </li>
+            </tbody>
+        </table>
+        <p class="col-lg-12" ng-show="plottype == 'SVG'">
+        This is a Value by Variable plot. Hover over the dots to see the exact XY values. Data is real time taken by benchmark in seconds. </p>
+        <p class="col-lg-12" ng-show="plottype == 'JSON'">
+        This is a 3D Scatter Plot. Hover over the dots to see the exact XYZ values.
+        Scroll to zoom. Click and drag the mouse to change the camera position. Data is time taken by benchmark in seconds </p>
+        <div class="col-lg-6" render-view view="Mean"></div>  <!-- pratik -->
+        <div class="col-lg-6" render-view view="CV"></div>  <!-- pratik -->
+        <div class="col-lg-6" render-view view="0"></div>
+        <div class="col-lg-6" render-view view="1"></div>
+        <div class="col-lg-6" render-view view="2"></div>
+        <div class="col-lg-6" render-view view="3"></div>
+        <div class="col-lg-6" render-view view="4"></div>  <!-- pratik -->
+    </div>
+</div>

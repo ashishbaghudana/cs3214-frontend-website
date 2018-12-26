@@ -1,0 +1,50 @@
+<h1>EshMD</h1>
+<p>The EshMD analysis consists of 2 components: static and dynamic.</p>
+<p>The analysis asserts certain invariants about your submitted code and
+    provides you with feedback on where they are invalidated. This can include invalid use of system calls
+    as well as misuse of the provided base code (such as the list functions).</p>
+
+<p>The static analysis looks at the code without running it.
+    This is accomplished by taking multiple passes through your code having setting conditions to be true and false,
+    and seeing what path through your code results.
+    This allows us to find a pass in your code that could be executed that results in unwanted
+    behavior.
+</p>
+
+<p>The dynamic analysis runs your code on a specific test case and looks at the actual behavior that your
+    program exhibits.
+    The initial run of EshMD will run on all of the tests run by <tt>stdriver.py</tt>.
+    For the dynamic analysis we provide the instrumented executable for you to run on your own tests as well.
+</p>
+<div>
+    <h3>
+        Static Analysis Results
+    </h3>
+    <p>The static analysis will list all bugs found and link to the path taken that caused the bug.</p>
+    <p>The example below shows a static analysis report that has flagged a double close on a file descriptor.</p>
+    <img src="images/StaticAnalyzerMainPage.bmp"/>
+    <p>Each bug report will show the annotated source code that traces the path through your code the static
+        analyzer took to arrive at its conclusion.</p>
+    <img src="images/StaticAnalyzerFlag.bmp"/>
+
+    <p>The static analysis will also flag general bugs, such as uninitialized variables.</p>
+</div>
+<div>
+    <h3>
+        Dynamic Analysis Results
+    </h3>
+    <p>The dynamic analysis will run each test and check the behavior of your shell.</p>
+    <p>The results of a test from the EshMD dynamic analysis are:</p>
+    <ul>
+        <li><span class="label label-success">Pass</span> - The program passed the test and no behavior was
+            flagged
+        </li>
+        <li><span class="label label-warning">Warning</span> - The program passed the test but EshMD flagged
+            some behavior
+        </li>
+        <li><span class="label label-danger">Fail</span> - The program did not pass the test</li>
+    </ul>
+    <p>When EshMD flags an error, it will produce backtraces.
+        You can use these to determine where in your code the error occurred.</p>
+    <img src="images/DynamicAnalysisError.png"/>
+</div>

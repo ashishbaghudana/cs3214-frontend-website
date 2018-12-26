@@ -1,0 +1,97 @@
+<div ng-controller="SubmissionController">
+    <div class="row">
+        <div class="col-lg-12">
+            <h1>Submission for {{user}}</h1>
+            <a ng-href="{{downloadLink}}" download>Download submission</a>
+            <div>
+            </div>
+            <div class="row">
+                <div class="col-lg-9">
+                    <pre ng-if="submission.result.grade.message">{{submission.result.grade.message}}</pre>
+                    <h2 ng-if="submission.result.grade.files">Relevant files in the submission for manual grading:</h2>
+                    <ul ng-repeat="file in submission.result.grade.files">
+                        <li>
+                            <h3>File: {{file.name}}</h3>
+                            <pre style="white-space: pre-wrap; font-family:monospace;">{{file.contents}}</pre>
+                        </li>
+
+                    </ul>
+                    <div ng-if="submission.result.grade">
+                        <div>
+                            <details open>
+                                <summary>
+                                    <h2>GRADE</h2>
+                                </summary>
+                                <pre>{{submission.result.grade | json}}</pre>
+                            </details>
+                        </div>
+                    </div>
+                    <div ng-if="submission.result.run">
+                        <div>
+                            <details ng-open="!submission.result.grade">
+                                <summary>
+                                    <h2>EXECUTION</h2>
+                                </summary>
+                                <pre>{{submission.result.run}}</pre>
+                            </details>\
+                        </div>
+                    </div>
+                    <div ng-if="submission.result.build">
+                        <div>
+                            <details ng-open="!submission.result.grade && !submission.result.run">
+                                <summary>
+                                    <h2>BUILD</h2>
+                                </summary>
+                                <pre>{{submission.result.build}}</pre>
+                            </details>
+                        </div>
+                    </div>
+                    <div ng-if="submission.result.extract">
+                        <div>
+                            <details
+                                    ng-open="!submission.result.grade && !submission.result.run && !submission.result.build">
+                                <summary>
+                                    <h2>EXTRACT</h2>
+                                </summary>
+                                <pre>{{submission.result.extract}}</pre>
+                            </details>
+                        </div>
+                    </div>
+                    <div>
+                        <details>
+                            <summary>
+                                <h2>Result</h2>
+                            </summary>
+                            <pre>{{submission.result.grade | json}}</pre>
+                        </details>
+                    </div>
+                </div>
+
+                <div class="col-lg-3" ng-if="submission.result.grade.points">
+                    <div bs-affix>
+                        <form>
+                            <p class="danger">Manual graded portions will be filled
+                                in after the assignment due date.</p>
+                            <p>Only the most recent submission for an assignment will be</p>
+                            <p>manually graded.</p>
+                            <div ng-repeat="(key, points) in submission.result.grade.points">
+                                    <label ng-if="points.value !== ''">{{key}}: {{points.description}} {{points.value}} out of {{points.max}}</label>
+                            </div>
+
+                            <label>Current Total: {{ pointTotal() }}</label>
+                        </form>
+
+                    </div>
+                </div>
+                <div class="col-lg-3" ng-if="!submission.result.grade.points">
+                    <div class="alert alert-danger" role="alert">
+                        Could not grade submission. See autograder output for details.
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+
+    </div>
+</div>

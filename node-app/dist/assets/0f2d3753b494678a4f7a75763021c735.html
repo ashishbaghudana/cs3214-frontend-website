@@ -1,0 +1,864 @@
+<div class="row">
+    <div class="col-lg-12">
+        <h2>Project 1 - Extensible Shell</h2>
+        <div class="col-lg-10">
+            <div class="panel panel-success">
+                <div class="panel-heading">
+                    Project Information
+                </div>
+                <div class="panel-body">
+                    <ul>
+                        <li>Read the <a ng-href="projects/esh-handout.pdf">Project Handout</a>.
+                        <li>Help Sessions:
+                            <table class="table">
+                                <tr><th>When</th><th>Where</th><th>Who</th><th>Slides</th></tr>
+                                <tr><td>Tuesday Jan 30th 7pm</td><td>331 Randolph Hall</td><td>James </td>
+                                    <td>
+                                        <a ng-href="projects/P1HelpSessionSlides.pdf">PDF</a>
+                                    </td>
+                                </tr>
+                                <tr><td>Thursday Feb 1st 7pm</td><td>331 Randolph Hall</td><td>Eric </td>
+                                    <td>
+                                        <a ng-href="projects/P1HelpSessionSlides.pdf">PDF</a>
+                                    </td>
+                                </tr>
+                            </table>
+                        </li>
+                        <li>Please register <a href="#!/grouper">your group</a>.
+                        </li>
+                        <li>URL to <a ng-href="https://git.cs.vt.edu/cs3214-staff/cs3214-esh">Git repository for base code</a>.</li>
+                        <li>You can try the following <a ng-href="https://courses.cs.vt.edu/~cs3214/fall2018/#!/analysis">experimental analysis tools</a> developed this semester to help you debug your shell.</li>
+                        <li><p>
+                            <b>How to run the provided tests:</b>
+                            Use the program <code>stdriver.py</code>.
+                            This program is checked in the git repository in the <a href="https://git.cs.vt.edu/cs3214-staff/cs3214-esh/tree/master/eshtests">eshtests</a> directory, and it is also available in
+                            <code>~cs3214/bin/stdriver.py</code>.
+                        </p>
+                            <p>Run <code>stdriver.py -h</code> to see its options. The test driver reads from a
+                                .tst file that describes a test suite.  For instance, the tests for the minimum
+                                required functionality are contained in <a href="https://git.cs.vt.edu/cs3214-staff/cs3214-esh/blob/master/eshtests/basic.tst">basic.tst</a>.  If you write your own tests for any functionality you
+                                add, you must create a .tst with their relative locations to run those tests.
+                            </p>
+                            <p>If you wish to make changes to the tests (i.e., to add debug output etc.),
+                                you can do so in your own copy, then tell stdriver.py to run those either via the
+                                -B option, or simply by invoking the copy of stdriver.py that is located in your
+                                eshtests directory.
+                                Since stdriver.py was not there when you forked your repository
+                                from the base code repository, you need to follow <a href="https://help.github.com/articles/syncing-a-fork/">these</a> instructions to pull the changes from the upstream repository into your working
+                                repository.
+                            </p>
+                        </li>
+                    </ul>
+                    <div class="alert alert-info"><b>How to submit:</b> Submit using the <a href="#!/submissions">submission page</a> or from the command line via <code>submit.py</code>
+                        under <code>p1</code>.  See <a ui-sref="project1submission">the project 1 submission instructions</a> for a detailed breakdown of the required files.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-10">
+            <div class="panel panel-success">
+                <div class="panel-heading">
+                    Plug-In Information
+                </div>
+                <div class="panel-body">
+                    <ul>
+                        <li>For plug-ins, follow the instructions in the handout.
+                            Where it asks for your group name, substitute slo_pid1+slo_pid2
+                            where slo_pid1 and slo_pid2 are the pids of your group members.
+                        </li>
+                        <li>Ignore the part where it asked to provide an eshoutput.py
+                            file for the plug-in tests.  (The handout has been updated to remove
+                            this part.)
+                        </li>
+                        <li>
+                            You can find the list of submitted plug-ins <a href="#!/proj1pluginlist">here</a>.
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+<script type="text/ng-template" id="waitpidsketch">
+/*
+ * SIGCHLD handler.
+ * Call waitpid() to learn about any child processes that
+ * have exited or changed status (been stopped, needed the
+ * terminal, etc.)
+ * Just record the information by updating the job list
+ * data structures.  Since the call may be spurious (e.g.
+ * an already pending SIGCHLD is delivered even though
+ * a foreground process was already reaped), ignore when
+ * waitpid returns -1.
+ * Use a loop with WNOHANG since only a single SIGCHLD
+ * signal may be delivered for multiple children that have
+ * exited.
+ */
+static void
+sigchld_handler(int sig, siginfo_t *info, void *_ctxt)
+{
+    pid_t child;
+    int status;
+
+    assert(sig == SIGCHLD);
+
+    while ((child = waitpid(-1, &status, WUNTRACED|WNOHANG)) > 0) {
+        child_status_change(child, status);
+    }
+}
+
+/* Wait for all processes in this pipeline to complete, or for
+ * the pipeline's process group to no longer be the foreground
+ * process group.
+ * You should call this function from a) where you wait for
+ * jobs started without the &; and b) where you implement the
+ * 'fg' command.
+ *
+ * Implement child_status_change such that it records the
+ * information obtained from waitpid() for pid 'child.'
+ * If a child has exited or terminated (but not stopped!)
+ * it should be removed from the list of commands of its
+ * pipeline data structure so that an empty list is obtained
+ * if all processes that are part of a pipeline have
+ * terminated.  If you use a different approach to keep
+ * track of commands, adjust the code accordingly.
+ */
+static void
+wait_for_job(struct esh_pipeline *pipeline)
+{
+    assert(esh_signal_is_blocked(SIGCHLD));
+
+    while (pipeline->status == FOREGROUND && !list_empty(&pipeline->commands)) {
+        int status;
+
+        pid_t child = waitpid(-1, &status, WUNTRACED);
+        if (child != -1)
+            child_status_change(child, status);
+    }
+}
+
+/* You may use this code in your shell without attribution. */
+</script>
+
+<script type="text/ng-template" id="giveterminalto">
+/**
+ * Assign ownership of ther terminal to process group
+ * pgrp, restoring its terminal state if provided.
+ *
+ * Before printing a new prompt, the shell should
+ * invoke this function with its own process group
+ * id (obtained on startup via getpgrp()) and a
+ * sane terminal state (obtained on startup via
+ * esh_sys_tty_init()).
+ */
+static void
+give_terminal_to(pid_t pgrp, struct termios *pg_tty_state)
+{
+    esh_signal_block(SIGTTOU);
+    int rc = tcsetpgrp(esh_sys_tty_getfd(), pgrp);
+    if (rc == -1)
+        esh_sys_fatal_error("tcsetpgrp: ");
+
+    if (pg_tty_state)
+        esh_sys_tty_restore(pg_tty_state);
+    esh_signal_unblock(SIGTTOU);
+}
+
+/* You may use this code in your shell without attribution. */
+</script>
+
+<script type="text/ng-template" id="wrongforkcode">
+    /* WRONG CODE */
+    if (fork() == 0) {
+        /* in child */
+        cmd->pipeline->status = FOREGROUND;   /* update child's status */
+        /* Above statement is wrong and pointless - it updates the
+            child's copy of the 'pipeline' object only.
+            All of the child's data, including everything on its heap, is about to
+            be discarded by the subsequent execvp call we are about to execute. */
+        execvp(cmd->argv[0], cmd->argv);
+    }
+</script>
+
+        <div class="col-lg-10">
+            <faq faq-heading="esh FAQ">
+                <uib-accordion close-others="oneAtATime">
+
+                    <uib-accordion-group in-faq heading="Does our shell need to fork for 'built-in' commands?">
+                        <p>No. Built-in commands are executed by the shell without forking a new process.
+                            Moreover, some built-in commands, notably <code>cd</code>, but also any command related to
+                            environment variables (such as bash's <code>export</code> command), must be executed
+                            in the shell's process or else their effect would vanish after the shell's child
+                            process exited.</p>
+                    </uib-accordion-group>
+
+                    <uib-accordion-group in-faq heading="Do we need to implement the shell initialization process shown in the GNU libc manual, section 27.6.2?">
+                        <p>No. You don't need to implement the <a href="http://www.gnu.org/s/libc/manual/html_node/Initializing-the-Shell.html#Initializing-the-Shell">initialization process</a> in this project.
+                            You may assume that your shell is started in the foreground (i.e., has ownership of its
+                            terminal) and is already in its own process group.  This will be the case if you test your shell by starting
+                            it from bash (type "./esh"), and it will also be the case if the shell is started from the Python
+                            test harness.  A more robust shell (suitable as a login shell) should do it, however.
+                        </p>
+                    </uib-accordion-group>
+
+                    <uib-accordion-group in-faq heading="Which version of exec* should we use?">
+                        <p>
+                            Read the manual (<code>man 3p exec</code>) to learn about the different versions.
+                            You may use any of them; a recommended function is execvp().
+                        </p>
+                    </uib-accordion-group>
+
+                    <uib-accordion-group in-faq heading="Why is our shell suspended when I hit ^Z or ^C to stop/terminate a foreground job?">
+                        <p>
+                            When a foreground process exits, the shell needs to reacquire the terminal
+                            (by making its own process group the foreground process group of its
+                            controlling terminal.)  This is done via tcsetpgrp().  Since the process
+                            issuing the tcsetpgrp() is not in foreground group, the tcsetpgrp() call
+                            will result in the delivery of SIGTTOU.  (The same rules that apply to
+                            all processes apply to your shell, too.)  In this case, this creates
+                            a catch-22: the shell itself needs to be the foreground process group
+                            to call readline() to receive the next input from the user, but the
+                            call needed to make the shell's process group the terminal's foreground
+                            process group requires that the calling process already is part of the
+                            foreground process group.  POSIX resolves this dilemma by stipulating
+                            that the shell should block SIGTTOU during the call to tcsetpgrp(),
+                            and that if it does, SIGTTOU will not be delivered.
+                        </p>
+
+                        <p>
+                            You can achieve this via the provided
+                            <code>esh_signal_block()/esh_signal_unblock()</code> functions, as shown in
+                            this code snippet:
+                        </p>
+                        <div hljs include="'giveterminalto'" language="c"> </div>
+
+                    </uib-accordion-group>
+
+                    <uib-accordion-group in-faq heading="Why is our shell suspended when I try to reassert ownership
+                of the terminal via tcsetpgrp()?">
+                        <i>... Or when I restore its terminal state with tcsetattr()?</i>
+                        <p>See previous question.</p>
+                    </uib-accordion-group>
+
+                    <uib-accordion-group in-faq heading="Where can I learn more about the rationale for POSIX job control?">
+                        <p>We highly recommend you read
+                            <a href="/cs3214/slologin/jobcontrol-posix1003.1.pdf">pages 18-21</a>
+                            of the POSIX 1003.1 Rationale.  The entire document is available
+                            <a href="/cs3214/slologin/posix1003.1.pdf">here.</a> (SLO Login required).
+                        </p>
+                    </uib-accordion-group>
+
+                    <uib-accordion-group in-faq heading="Are we required to use the functions in esh-sys-utils.c?">
+                        <p>These functions provide convenient wrappers for the signal masking and handling functions you need,
+                            as well as functions to save and restore the state of the terminal.  They use the POSIX API as discussed
+                            in the book in Section 8.5.5.  There is no need to use old-style, pre-POSIX signal handlers
+                            (e.g., using <code>signal()</code> or the book's <code>Signal()</code> function, as used in the
+                            examples in 8.5.1-8.5.4.)  The functions in esh-sys-utils.c are used in my sample solution.
+                        </p>
+                    </uib-accordion-group>
+
+                    <uib-accordion-group in-faq heading="How does our shell continue a stopped job?">
+                        <p>By sending the SIGCONT signal to the job's process group.  If the job is also made the foreground job,
+                            SIGCONT must be sent after ownership of the terminal has been transferred.
+                        </p>
+                    </uib-accordion-group>
+
+                    <uib-accordion-group in-faq heading="Why do my pipes not work?">
+                        <i>... <code>strace</code> shows the pipe() and dup2() calls
+                            I'd expect.  It seems the child process never exits, so my shell is stuck in waitpid()?</i>
+
+                        <p>Check that the shell closes its copy of the pipe file descriptor(s) after the fork().
+                            If it doesn't, since there's still an open file descriptor referring to the write end,
+                            the pipe itself will not be closed, and programs
+                            that read until they exhaust their standard input (such as <code>cat</code>, <code>grep</code> and
+                            so on) will be stuck attempting to read from their stdin.  Use <code>ls -l /proc/NNNNN/fd</code>
+                            where NNNNN is the pid of your shell to examine the state of the shell's file descriptors.
+                        </p>
+                    </uib-accordion-group>
+
+                    <uib-accordion-group in-faq heading="Why can I not pass a 'struct list' as a parameter to a function?">
+                        <p>The provided list class uses head and tail sentinels that are stored in each struct
+                            list instance.  The last element in the list contains a 'next' pointer to the tail sentinel, and
+                            the first element contains a 'prev' pointer to the head sentinel.  If you copied the struct list
+                            instance, those pointers would not be updated, rendering the copied struct list instance useless.
+                            <b>Always</b> pass pointers to a <code>struct list</code> to functions, as in <code>struct list *</code>.
+                        </p>
+                        <div hljs language="c">
+void myfunction(struct list *l) { // ok
+}
+
+void dontdeclareafunctionlikethis(struct list l) { // will not work
+}
+                        </div>
+                        <p>
+                            To avoid other list-related pitfalls, particularly pitfalls related to deleting elements and iterating
+                            over lists, you must read list.c.
+                        </p>
+                    </uib-accordion-group>
+
+                    <uib-accordion-group in-faq heading="Do we need to use the getopt() function?">
+                        <p>The only use for it that I could see is if you're implementing sophisticated built-in commands
+                            with many switches/options.  Otherwise, probably not.  Note that the provided parser code prepares
+                            each command line already in a form that can be passed to <code>execvp()</code>.
+                        </p>
+                    </uib-accordion-group>
+
+                    <uib-accordion-group in-faq heading="Do we need to change the provided grammar, for instance, to add built-in commands?">
+                        <p>No.  Although theoretically possible, this is not a recommended approach. But if you're familiar
+                            with yacc/lex and wish to add additional features (say redirecting stdout/stderr separately), you're
+                            welcome to extend it.
+                        </p>
+                    </uib-accordion-group>
+
+                    <uib-accordion-group in-faq heading="When a foreground job is stopped and later resumed, do we need to make sure that the state of the terminal is preserved?">
+                        <p>Yes. Some processes place the terminal in a special, so-called 'raw' state.  For instance, vi does that.
+                            In 'raw' state, the program receives characters as they are typed.  (By contrast, in the 'cooked' state,
+                            programs normally read lines of input.)  If a foreground job is suspended and later resumed, you need to save
+                            and restore whatever state it placed the terminal in.  Use the provided functions in <code>esh-sys-utils.c</code>
+                            for this purpose, which wrap the tcsetattr()/tcgetattr() functions.
+                            Note that you do not need to understand what exact state the job put the terminal in.
+                            On a related note, if a
+                            process that places the terminal in the raw state is stopped, the shell must restore the original state of
+                            the terminal before issuing the next prompt.  To that end, save the initial state of the terminal
+                            when the shell is first started and restore this state whenever the shell outputs its prompt and
+                            waits for user input.
+                        </p>
+                        <p>
+                            The rationale for this approach is that a job control shell must allow the execution of programs
+                            that are themselves job control unaware, i.e., programs that assume they have exclusive control
+                            of the terminal.
+                            <a href="/cs3214/slologin/jobcontrol-posix1003.1.pdf">See here.</a>
+                        </p>
+                        <p>You may use this code snippet.</p>
+                        <div hljs include="'giveterminalto'" language="c"> </div>
+                    </uib-accordion-group>
+
+                    <uib-accordion-group in-faq heading="I'm confused about which signals we need to catch.">
+                        <p>The only signal that you must catch is SIGCHLD. When SIGCHLD arrives, you need to reap
+                            any children whose status may have changed and update the shell's data structures accordingly.
+                        </p>
+                        <p>Optionally, you may catch SIGINT (^C).
+                            Catching SIGINT could be used, for instance, to allow
+                            a user to abort a partially completed command line, like bash does.  You would need to use
+                            sigsetjmp()/siglongjmp() to that end, as shown on a lecture slide. Note that when the user types
+                            ^C, SIGINT will reach the shell only when it is in the foreground process group, which is the case
+                            only while no other foreground job is running - namely, while the shell waits for
+                            user input.  </p>
+                        <p>When a foreground job is running, it will have ownership of the terminal.  This means that
+                            the keys ^Z and ^C cause the OS to send SIGTSTP and SIGINT directly to the processes in the
+                            foreground process group, and *not* to the shell.  So, for SIGTSTP and SIGINT to stop/terminate
+                            your foreground process, you don't have to do any signal handling!</p>
+                        <p>A second signal you may optionally catch or ignore is SIGTSTP. Like ^C, ^Z will reach the
+                            shell only while waiting for user input.  You could ignore SIGTSTP so
+                            that the shell isn't suspended itself when the user types ^Z instead of typing a command.
+                            This is what most shells do, as you can observe by typing ^Z on a bash prompt.</p>
+                    </uib-accordion-group>
+
+                    <uib-accordion-group in-faq heading="Why is the use of -Werror mandatory?">
+                        <p>Because we've seen students too many times wasting their time and ours trying
+                            to debug obviously wrong code.
+                        </p>
+                    </uib-accordion-group>
+
+                    <uib-accordion-group in-faq heading="I'm trying to compile your code on my machine at home, but it doesn't work.">
+                        <p>Building the project on any environment other than our lab machines is not officially
+                            supported.   That said, the code should build on most recent Linux distributions (including
+                            Debian and Redhat-based ones.)
+                            Feel free to share any problems you encounter on the Piazza forum!
+                        </p>
+                    </uib-accordion-group>
+
+                    <uib-accordion-group in-faq heading="What's the relationship between a job, a process group, and a pipeline?">
+                        <p>These terms are often used synonymously, but they describe different aspects.
+                            A pipeline is a sequence of one or more user commands separated by the pipe (|) symbol,
+                            which will result in the execution of one or more processes.  Each pipeline forms a job.
+                            A new process group is created for each job.  By convention, the first process of each
+                            pipeline becomes the leader of the job's process group, the other processes join the
+                            leader's process group.
+                        </p>
+                        <p>
+                            So, put briefly, each pipeline is a job, and each job has its own process group.
+                        </p>
+                    </uib-accordion-group>
+
+                    <uib-accordion-group in-faq heading="When I start a process in the foreground, should I
+call tcsetpgrp() in the parent (before waiting for the process) or the
+child (before exec'ing the command)?">
+                        <p>Think about what could happen in each case.  You need to avoid a situation where
+                            the launched program performs some action that requires ownership of the terminal, but
+                            tcsetpgrp() hasn't been called.  In addition, when you call tcsetpgrp(), the process
+                            group you specify must have been created also.  Read
+                            <a href="/cs3214/slologin/jobcontrol-posix1003.1.pdf">pages 18-21 of the POSIX rationale document</a>.
+                        </p>
+                    </uib-accordion-group>
+
+                    <uib-accordion-group in-faq heading="Is there a way to learn if all processes that are
+part of a pipeline have terminated?">
+                        <p>No.  You will receive notifications for each process that's part of a pipeline/job.
+                            They may exit in any order.  Your shell must manage this: for instance, if a pipeline/job
+                            that consists of multiple processes is running in the foreground, the shell should not
+                            prompt for new input until after all processes that are part of the job have been
+                            reaped (and your shell received confirmation from the OS that they've terminated.)
+                        </p>
+                        <p>Note that one call to waitpid() yields only one notification, even if you've
+                            specified waitpid(-1,..) to accept notifications for any of your children. This is so
+                            that the status of each child can be reported, separately.  You will thus
+                            need to call waitpid() repeatedly.</p>
+                    </uib-accordion-group>
+
+                    <uib-accordion-group in-faq heading="My pipes don't work even though I used pipe() and
+dup2() correctly.">
+                        <i><code>strace -ff</code> shows that writing
+                            to file descriptor 1/reading from file descriptor 0 by the child processes
+                            results in -1 EBADF.</i>
+
+                        <p>You probably confused the read and write ends of the pipe.
+                        </p>
+                    </uib-accordion-group>
+
+                    <uib-accordion-group in-faq heading="My shell works when I test it on
+the command line but fails with the Python/pexpect test harness.">
+                        <p>This may have several reasons.  A common one is that the output of
+                            your shell does not match what the test script expects, and/or that you
+                            haven't adapted the file describing the output format of your shell
+                            accordingly.  Among others, the test harness expects that the name
+                            of a job can be extracted via a regular expression from the job list.
+                            In addition, it expects that the shell echoes the command line of a job
+                            when it executes the 'fg' command.  (Like bash does.)
+                        </p>
+                        <p>
+                            Another common failure mode is to forget to ensure that the regular
+                            expression given by the variable <code>job_status_regex</code> in your
+                            eshoutput.py must match the output your shell produces when a stop is
+                            stopped (or in general its status is printed).  The default we provide
+                            would assume your shell outputs job messages where the job is listed
+                            inside parentheses, such as in:
+                        <pre>
+[1]   Stopped         (sleep 20)
+</pre>
+                        See also Q. 39.
+                        </p>
+                    </uib-accordion-group>
+
+                    <uib-accordion-group in-faq heading="After we place esh_pipeline objects into our jobs
+    list we get a segfault in the loop where we go through the list of
+    pipelines in the esh_command_line list - valgrind says 'Invalid read of size 4'">
+                        <p>An object can only be in one list at a time.  If you're placing an
+                            esh_pipeline object into a new list without first removing it from
+                            the old list, you're corrupting the old list's next/prev pointers.
+                            This will lead to undefined results if you're doing this while
+                            iterating over the old list.  Read list.c for techniques of how
+                            to avoid this.  If you need to keep an object in multiple lists
+                            simultaneously, you must provide separate list_elem fields.
+                        </p>
+                    </uib-accordion-group>
+
+                    <uib-accordion-group in-faq heading="We update our job list and the job status before calling execvp(), but
+    the update is ignored/does not work.">
+                        <p>A common mistake is to misunderstand the effect of fork().  When the shell calls fork(),
+                            a new child process is created.  The child process will eventually call exec() to load the
+                            program the user desired while the parent process will continue to implement the
+                            shell functionality - wait for foreground jobs, implement job control etc.   The child process
+                            obtains a copy of all data from the parent at the time fork() is called.  "All data" here
+                            means all heap objects, all global, and all local variables.  This copy will have the same values that it had
+                            before the fork(), but <b>any modifications affect only the child's copy.</b>
+                            When the child execs, all of its data is wiped and replaced with the data of the new program.
+                            So, code like this
+                        </p>
+                        <div hljs include="'wrongforkcode'" language="c"> </div>
+                        <p>
+                            is utterly wrong. Make sure that anything related the management of job lists, job status, etc.
+                            is done before the fork(), or after the fork() in the context of the parent (shell) process.
+                            Be aware that while you can use local/global variables and heap objects to pass information
+                            from the parent to the child when it is forked, you cannot use those variables to pass information
+                            back from the child to the parent, or from the parent to the child after the child has been forked.
+                        </p>
+                    </uib-accordion-group>
+
+                    <uib-accordion-group in-faq heading="When should we add error checking for our system calls?">
+                        <p>When you code them.  An all-too-frequent mistake is for students to waste hours or
+                            even days debugging their code's logic when they could have found the error immediately
+                            or in short time simply by checking which system calls fail, and why.
+                            Make sure you understand how to use errno and perror(3).
+                        </p>
+                    </uib-accordion-group>
+
+                    <uib-accordion-group in-faq heading="Is it normal for waitpid() to return -1?">
+                        <i>...Or: What do I pass to waitpid() as the first parameter?</i>
+                        <p>The strategy for using waitpid() correctly is a bit tricky. waitpid() must be called
+                            on three code paths: when waiting for a process started as a foreground process to terminate,
+                            when implementing the 'fg' command, and also from inside the SIGCHLD handler.
+                        </p>
+                        <p>You should call waitpid() in all of these situations with -1 as the first argument and
+                            using the WUNTRACED option; when calling it in the SIGCHLD handler, also specify WNOHANG
+                            using the bitwise | operator.
+                        </p>
+                        <p>To avoid race conditions, keep SIGCHLD blocked when calling waitpid() while waiting
+                            for a foreground job.  (Note that SIGCHLD is blocked inside the SIGCHLD signal handler
+                            already.) But do not keep SIGCHLD blocked all the time - when the shell sits at the
+                            command prompt, waiting for user input, SIGCHLD must be unblocked so that the shell
+                            can reap terminating children.</p>
+                        <p>Since you are passing -1, it may happen that while waiting for a foreground job waitpid()
+                            returns to tell you about a background job that terminated.  In that case, you must record
+                            this information in your job list (since the OS will tell you only once about it!), and
+                            then call waitpid() again. Here is a code snippet you can use
+                            to implement this approach:
+                        </p>
+                        <div hljs include="'waitpidsketch'" language="c"> </div>
+                        <p>Note also that even though the waitpid() call issued by the shell when waiting for
+                            a foreground job will reap any children that have exited or changed status, a SIGCHLD
+                            signal, once pending, will still be delivered as soon as you unblock SIGCHLD.
+                            In that case, the OS has nothing to report when you call waitpid().
+                            That's why you must use the WNOHANG flag in the SIGCHLD handler and that's why
+                            you should ignore if waitpid() returns -1 there.
+                        </p>
+                    </uib-accordion-group>
+
+                    <uib-accordion-group in-faq heading="What's the difference between blocking a process and blocking a signal?">
+                        <p>The verb "to block" is used in at least two different meanings in operating systems.
+                            Used as a transitive verb,
+                            a process may "block" when it encounters a situation in which it cannot make progress.
+                            For instance, a process may wait for some event (such as a read() operation to complete,
+                            or a child process to exit, or simply for some time to pass).  In this case, we say the
+                            process is blocked.  Blocked processes do not use CPU time.  They are unblocked when what
+                            they're blocked on finally happens.  At that point, they become ready and the scheduler
+                            will eventually resume them as soon as a CPU/core becomes available.
+                        </p>
+                        <p>Another meaning of "to block" uses block as an intransitive verb, as in "blocking a signal."
+                            Blocking here means to
+                            delay the delivery of a pending signal until some later point in time.  This is accomplished
+                            by using an appropriate system call (sigmask(2) or sigblock(2)).  It is needed when there is
+                            a potential for race conditions between the signal handler and the main control flow of
+                            a program.
+                        </p>
+                    </uib-accordion-group>
+
+                    <uib-accordion-group in-faq heading="Why does eshoutput.py expect a CRLF (\r\n) instead of LF (\n)">
+                        <i>... I thought the Unix line termination character was LF (<code>\n</code>)?</i>
+                        <i>Or: ... How come ^Z shows up if I turn on logging in eshoutput.py - I thought ^Z results in
+                            SIGTSTP being sent?</i>
+                        <p>The regular expressions in eshoutput.py refer to the information that is output
+                            the master side of the pseudo terminal, and the logfile logs everything that is input into
+                            the master side of the pseudo terminal.  Your shell, on the other hand, is connected to
+                            the pseudo terminal's slave end.   The pty driver performs the same operations a regular
+                            terminal driver would. It can also be customized in the same way.
+                            For instance, if the flag <code>ONLCR</code> is set, it will transform a NL into a
+                            CRLF (See termios(3); you can run <code>stty -a</code> to see which flags are enabled
+                            by default for the pseudo terminal used by ssh.).  Similarly, if ^Z is sent to the
+                            master end of the terminal, SIGTSTP will be sent to the terminal's foreground process job.
+                        </p>
+                        <p>
+                            pty(7) summarizes the functionality provided by pseudo terminals:
+                        <pre>
+   A  pseudo-terminal  is a pair of virtual character devices that provide a bidirectional
+   communication channel.  One end of the channel is called the master; the other  end  is
+   called  the  slave.   The  slave  end of the pseudo-terminal provides an interface that
+   behaves exactly like a classical terminal.  A process that expects to be connected to a
+   terminal,  can  open the slave end of a pseudo-terminal and then be driven by a program
+   that has opened the master end.  Anything that is written on the master end is provided
+   to  the process on the slave end as though it was input typed on a terminal.  For exam-
+   ple, writing the interrupt character (usually control-C) to  the  master  device  would
+   cause  an  interrupt  signal  (SIGINT) to be generated for the foreground process group
+   that is connected to the slave.  Conversely, anything that is written to the slave  end
+   of  the pseudo-terminal can be read by the process that is connected to the master end.
+   Pseudo-terminals are used by applications  such  as  network  login  services  (ssh(1),
+   rlogin(1), telnet(1)), terminal emulators, script(1), screen(1), and expect(1).
+</pre>
+                        <p>
+                            (<a href="http://expect.sourceforge.net/">'expect(1)'</a> is a program that performs
+                            similar functionality as the
+                            <a href="http://www.noah.org/wiki/pexpect">pexpect library</a> Patrick Boyd (a former CS 3214 UTA)
+                            extended for our testing framework.)
+                        </p>
+                    </uib-accordion-group>
+
+                    <uib-accordion-group in-faq heading="I'm trying use setpgrp() or getpgid(), but it doesn't compile.">
+                        <p>
+                            You need to read the fine print in the man page for these functions:
+                        </p>
+                        <pre>
+       To get the  prototypes  under  glibc,  define  both  _XOPEN_SOURCE  and
+       _XOPEN_SOURCE_EXTENDED, or use "#define _XOPEN_SOURCE n" for some integer
+       n larger than or equal to 500.
+</pre>
+                        <p>
+                            So, use:
+                        </p>
+                        <pre>
+#define _XOPEN_SOURCE 500
+#include &lt;unistd.h&gt;
+</pre>
+                        <p>
+                            The reasons for this are historical. If you look at the
+                            <a href="http://www.freebsdnews.net/wp-content/uploads/unix_family_history_tree_1600x1200.jpg">Unix
+                                family tree</a> you'll see two major branches: systems deriving from
+                            System V on the left, and systems in the BSD line in the center. Linux,
+                            on the right, now attempts to provide support for both lines; sometimes,
+                            there are functions with the same name, but different signatures
+                            (for instance, setpgrp()). Then you have to tell it which one you want by
+                            defining certain pre-processor constants. In this assignment, you should
+                            not need to use any such functions. Use setpgid() instead of setpgrp(),
+                            and the only place where you would need to learn a process's process group
+                            is to identify the shell's own process group. Use getpgrp() for this purpose,
+                            as suggested in setpgid(2).  There is no need to ever call getpgid() on a process pid
+                            other than your own (that is, the shell's).
+                        </p>
+                    </uib-accordion-group>
+
+                    <uib-accordion-group in-faq heading="Linux's man page for sigaction(2) says that siginfo-&gt;si_pid contains
+the pid of the child process that caused SIGCHLD.  Why then can I not use it?">
+                        <p>When POSIX signal handling is used, the OS will pass along additional information
+                            to the signal handler in arguments #2 and #3.  Argument #2 is of type siginfo_t.
+                            See  <a href="http://www.kernel.org/doc/man-pages/online/pages/man2/sigaction.2.html">sigaction(2).</a>
+                            However, since traditional Unix signals are not queued, si_pid for a SIGCHLD will contain
+                            the pid of the first child that caused SIGCHLD to become pending.  Therefore, it cannot
+                            be used to learn which children need to be reaped. You must use waitpid(-1, ...).
+                            Study <a href="/~cs3214/fall2018/gback/examples/signal/sigchlddoesnotqueue.c">sigchlddoesnotqueue.c</a>
+                            for an example.
+                        </p>
+                    </uib-accordion-group>
+
+                    <uib-accordion-group in-faq heading="My shell crashes, but I don't see any messages such as 'Segmentation Fault'">
+                        <p>Keep in mind that such messages are printed only if a (working) shell detects that one of its
+                            child processes terminated with SIGSEGV.  Your shell will be the child process of your login shell
+                            (typically bash); so if the segmentation fault occurs in your shell process, you'll likely see
+                            the error message printed by bash.  However, if your shell crashes on the code path between
+                            when it forks a new process (about to exec() a command), then it would be your shell's responsibility
+                            to print this error message after waiting for the child.  If it does not do that yet, you won't
+                            see anything.  valgrind is of great help here: it follows both the parent and the child process
+                            and reports segmentation faults in either.
+                        </p>
+                    </uib-accordion-group>
+
+                    <uib-accordion-group in-faq heading="I don't understand how to use 'sa_sigaction_t'">
+                        <p><tt>sa_sigaction_t</tt> is a convenience function pointer type that is declared in <tt>esh-sys-utils.h</tt>
+                            like so:
+                        </p>
+                        <pre>
+/* Signal handler prototype */
+typedef void (*sa_sigaction_t)(int, siginfo_t *, void *);
+</pre>
+                        <p>
+                            Any void-returning function with a signature of <tt>(int, siginfo_t *, void *)</tt> can be substituted where
+                            a variable of type <tt>sa_sigaction_t</tt> is expected.  This means you should declare your signal
+                            handling routine to have this signature, then you can pass it to <tt>esh_signal_sethandler</tt> which
+                            provides a convenient wrapper for the underlying sigaction(2) system call that installs this
+                            signal handler. I recommend using this function instead of the outdated <tt>signal(2)</tt> function,
+                            because it allows more fine-grained control over the signal processing semantics. For instance,
+                            you can specify that system calls that are interrupted by a signal be automatically restarted;
+                            you can specify that additional information be sent along to the signal handler routine (such as
+                            in the case of SIGSEGV, where a program faulted), and you can specify exactly which additional
+                            signals, if any, should be blocked during the execution of the signal handler.
+                        </p>
+                        <p>In my opinion, there's rarely a reason to use signal(2) anymore; however others have
+                            pointed out that signal(2) is <a href="http://www.gnu.org/s/hello/manual/libc/Signal-and-Sigaction.html">part
+                                of ISO C</a> and may be preferred for portability in general. However, <a href="http://www.schweikhardt.net/identifiers.html">as
+                                shown in this table</a>, SIGCHLD is part of POSIX only and not part of ISO C, given its
+                            Unix-specific semantics.  This differs from such signals as SIGINT or SIGSEGV, which can be meaningfully
+                            implemented in any C language environment.</p>
+                        <p>Please see also Q. 28</p>
+                    </uib-accordion-group>
+
+                    <uib-accordion-group in-faq heading="Do we need to perform any signal-related setup for the programs our shell executes?">
+                        <p>Recall that a process can dictate, for each signal with the exception of SIGKILL, what it wants to do
+                            if that signal is raised (handle, ignore, or take the default action which may be termination). In addition,
+                            for signals that it handles, it can temporarily delay their delivery by blocking them.
+                        </p>
+                        <p>If a process sets up any special handling for signals and/or blocks signals, any children of the process will
+                            inherit such actions and they will also inherit the parent's signal mask (a bitmask describing which signals are blocked, if any).
+                            So if your parent
+                            shell blocks SIGCHLD when calling fork(), SIGCHLD will be blocked in the child.  (Note, however, that the child
+                            is its own separate process for the purpose of signal delivery - the reasons for why it may receive SIGCHLD
+                            are completely separate from why the parent process may receive SIGCHLD, or any of the other signals.
+                            On fork(), pending signals that have not yet been delivered to the parent do not become pending in the child so that the child doesn't accidentally receive signals not intended for it.)
+                        </p>
+                        <p>If a process executes a new program, the signal handling is also largely unaffected, with one notable
+                            exception: any signal that has a handler will be reset to the default action - this makes sense since the signal
+                            handler itself belongs to the old program being replaced by the exec() call.  However, exec() does not
+                            affect whether signals are ignored or blocked - a signal that is ignored or blocked will remain ignored or blocked.
+                        </p>
+                        <p>Your shell must make sure that new programs are started with reasonable signal settings for each
+                            signal. That means that all signals have their default actions, and no signal is blocked.  Consequently,
+                            if your shell blocked any signal (such as SIGCHLD) in the parent, the signal should be unblocked
+                            in the child before the exec() call. Similarly, if you decide to ignore any signals (such as
+                            SIGINT, perhaps), reinstall the default behavior before calling exec().  You may call
+                            <tt>esh_signal_sethandler(SIGINT, (sa_sigaction_t) SIG_DFL);</tt> to that end.  Otherwise,
+                            the child process would ignore SIGINT, and you couldn't terminate it with ^C.
+                            You do not need to reset signals you handle, such as SIGCHLD, to their default action -
+                            exec() will do that for you.
+                        </p>
+                    </uib-accordion-group>
+
+                    <uib-accordion-group in-faq heading="My shell gets stuck on the command line after I type one letter!">
+                        <p>For example, when I start a process in the background like so:
+                        </p>
+                        <pre>
+$ ./esh
+esh&gt; sleep 30 &
+[1] 1818
+esh&gt; j<font color="red">Here is where the shell is stuck.  I can't type anything anymore.</font>
+</pre>
+                        <p>In addition, when I log onto the same machine on another terminal, I see my esh process consuming
+                            100% of the CPU (using top).
+                        </p>
+                        <pre>
+  PID USER      PR  NI  VIRT  RES  SHR S %CPU %MEM    TIME+  COMMAND
+ 1805 cs3214    20   0  107m 1212  948 R 71.8  0.1  26:01.35 esh
+</pre>
+                        <p>When I use strace to see what it's doing, I seeing constantly repeating output like this:
+                        </p>
+                        <pre>
+$ strace -p 1805
+.... lots of output like this ....
+ioctl(0, SNDCTL_TMR_STOP or TCSETSW, {B38400 opost isig icanon echo ...}) = ? ERESTARTSYS (To be restarted)
+--- SIGTTOU (Stopped (tty output)) @ 0 (0) ---
+</pre>
+                        <p>
+                            When I attach gdb, I see that it's calling tcsetattr() from readline(), which is called
+                            in my main() function:
+                        </p>
+                        <pre>
+(gdb) attach 1805
+(gdb) bt
+#0  0x0000003b0f0d8f78 in tcsetattr () from /lib64/libc.so.6
+#1  0x0000003b1041979f in ?? () from /lib64/libreadline.so.6
+#2  0x0000003b10419b60 in rl_deprep_terminal () from /lib64/libreadline.so.6
+#3  0x0000003b10426ada in rl_cleanup_after_signal () from /lib64/libreadline.so.6
+#4  0x0000003b10426f89 in ?? () from /lib64/libreadline.so.6
+#5  0x0000003b1042919e in rl_getc () from /lib64/libreadline.so.6
+#6  0x0000003b104296c0 in rl_read_key () from /lib64/libreadline.so.6
+#7  0x0000003b1041550f in readline_internal_char () from /lib64/libreadline.so.6
+#8  0x0000003b10415a55 in readline () from /lib64/libreadline.so.6
+#9  0x0000000000406552 in main (ac=1, av=0x7fff7ef59348) at esh.c:495
+</pre>
+                        <p><b>Answer:</b> You do not have ownership of the terminal when you call readline().
+                            Readline() assumes it has ownership so it can safely call, for instance, tcsetattr() - which
+                            is a function that requires such ownership.  If that's not the case, readline() will
+                            act in undefined ways (apparently blindly retrying over and over after SIGTTOU is sent.)
+                        </p>
+                        <p>In the example shown above, the most likely reason is that you wrongly gave ownership
+                            of the terminal to the 'sleep 30 &' background job the user started.  If the user starts
+                            a job in the background, that job must not be given ownership of the terminal.
+                        </p>
+                        <p>In order to not have to separately handle the case where a foreground job (which must
+                            be given ownership of the terminal!) terminates or exits, it may be useful to simply
+                            also reacquire ownership before calling readline() (or even better, before printing
+                            anything, including the prompt).
+                        </p>
+                        <p>Note that you still must avoid giving terminal ownership to the background job to
+                            avoid the race condition where the background job (in the child process, before the
+                            exec()), snaps away ownership from the shell that's already returned to the prompt.
+                        </p>
+                    </uib-accordion-group>
+
+                    <uib-accordion-group in-faq heading="When I add the second process of a pipeline to the pipeline's
+    process group, setpgid() fails with EPERM 'Operation not permitted'">
+                        <p>This occurs when the process group to which you are trying to add the process
+                            no longer exists, for instance, because all the processes in it have already terminated.
+                            This can occur if you (erroneously) wait for the first child in a pipe to finish
+                            before forking the second child.
+                        </p>
+                        <p>Waiting for the first child also breaks a pipe's built-in flow control
+                            mechanism. If the first child outputs more than the pipe's bounded buffer capacity, it will block
+                            forever since you never start the second child that would have otherwise drained
+                            the pipe and consumed the data produced by the first child.
+                            In current Linux kernel's, a pipe's capacity is only 64K.
+                            In addition, you're giving up parallelism.
+                        </p>
+                        <p>The Linux man page for setpgid() is incomplete in that it does not list the
+                            case where pgrp no longer exists.  Even though EPERM seems unusual here - ESRCH
+                            would perhaps have been more clear to the user, <a href="http://pubs.opengroup.org/onlinepubs/9699919799/functions/setpgid.html">POSIX 1003.1/2013 actually calls for EPERM</a> here:
+                        </p>
+                        <pre>
+[EPERM]
+    The value of the pgid argument is valid but does not match the process ID
+    of the process indicated by the pid argument and there is no process with
+    a process group ID that matches the value of the pgid argument in the same
+    session as the calling process.
+</pre>
+                    </uib-accordion-group>
+
+                    <uib-accordion-group in-faq heading="What's a good way to get started on this project?">
+                        <p>A good way to get started is to read the book chapter (8), then read the provided code.
+                            A reasonable first milestone could be the execution of a single program (along with command
+                            line arguments) in the foreground.  That is, get your shell to run commands such as <code>ls</code>
+                            and return to the prompt when they have finished.
+                        </p>
+                    </uib-accordion-group>
+
+                    <uib-accordion-group in-faq heading="Can we use signalfd(2) instead of using signal handlers?">
+                        <i>(No one has really asked that question yet, and I don't know if anyone has considered that, either.)</i>
+                        <p>I think so, although you'll be trading one set of complexity for another and you'll need to learn
+                            some additional system calls.
+                        </p>
+                        <p>Signal handlers have the drawback that they introduce asynchronous control flow in your program:
+                            while SIGCHLD is not blocked/masked, it may arrive at any point in time and cause your SIGCHLD
+                            handler to be executed.  If you use <code>signalfd()</code>, you can instead learn when a signal
+                            has become pending, then execute a read() system call to consume it without ever invoking the
+                            signal handler, thus avoiding asynchronous control flow.
+                        </p>
+                        <p>Learning when the signal has become pending requires learning when that file descriptor
+                            has become readable (e.g., it is possible to call read() without causing the process to be
+                            blocked inside the read() system call waiting for a signal). You need to use select(2) or a
+                            similar call for that.  The problem you are facing then is that you need to also read
+                            user input after the shell has output its prompt.
+                        </p>
+                        <p>Fortunately, the readline() function esh uses has an <a href="http://www.delorie.com/gnu/docs/readline/rlman_41.html">alternate API</a> designed for this purpose
+                            in the <code>rl_callback_*</code> family of functions.  Read <a href="http://stackoverflow.com/questions/1706678/ncurses-and-stdin-blocking">this example</a>
+                            on stackoverflow to get the general idea.  Thus, your main function must set up a signal file descriptor, then execute a
+                            select() loop in which it selects both on stdin and the signal fd.  If stdin becomes readable, it'll call
+                            <code>rl_callback_read_char()</code>, if the signal fd becomes readable, it needs to reap all children
+                            that can be reaped at this point in time (again using WNOHANG in a loop).  (As before, SIGCHLD is
+                            not queued.)
+                            The shell will perform command line processing if <code>rl_callback_read_char()</code> calls the handler
+                            installed with <code>rl_callback_handler_install()</code>.
+                        </p>
+
+                    </uib-accordion-group>
+
+                    <uib-accordion-group in-faq heading="Can we reuse the data structures allocated by the parser?">
+                        <p>Yes! Making a copy is not necessary, but make sure you remove the call to the <code>esh_command_line_free</code>
+                            function that is in the provided code.
+                        </p>
+                        <div hljs language="c">
+esh_command_line_free(cline);   // remove me
+                        </div>
+                    </uib-accordion-group>
+
+                    <uib-accordion-group in-faq heading="Why am I getting a segmentation fault when iterating over the command line?">
+                        <p>The provided list implementation requires that you remove an element from the list that contains it <b>before</b>
+                            you place it into another list. Otherwise, the list elements in the old list will still point to the element.
+                            Thus, if you are using the linked list of pipelines produced by the parser, make sure you remove them from the
+                            command line list before adding them to your jobs list.  <code>list_pop_front()</code> may be used here, inside
+                            the body of a while loop that checks if the remaining list is empty.
+                        </p>
+                    </uib-accordion-group>
+
+                    <uib-accordion-group in-faq heading="Where can I learn more about regular expressions?">
+                        <p>Stackoverflow has a <a href="http://stackoverflow.com/questions/4736/learning-regular-expressions">good page</a>
+                            that introduces basic concepts and provides pointers to books and other resources.
+                            The specific syntax of Python regular expressions (which we use) is described
+                            <a href="https://docs.python.org/2/library/re.html">here</a>
+                        </p>
+                    </uib-accordion-group>
+
+                    <uib-accordion-group in-faq heading="How do I make sure that my submissions passes the tests when grading?">
+                        <p>In most cases, if you reliably pass the tests when you run them, they will also pass when we run them.
+                            However, since this assignment is done in C, and C is a type-unsafe language that makes it <a ng-href="https://people.csail.mit.edu/nickolai/papers/wang-stack.pdf">easy to write code that invokes undefined behavior</a>, you should use proper development
+                            and debugging techniques to rule those out to the extent possible.  This includes, for one, using a high level
+                            of compiler warnings (<tt>-Wall -Werror</tt>, as pointed out in this FAQ - though you could turn on additional
+                            warnings (<tt>-Wextra</tt>)).  Second, we urge you to run your shell under valgrind and exercise its functionality
+                            (use job control, etc.).  This will flag, for instance, if your shell passes uninitialized data to system calls
+                            which can make you fail tests under certain runtime conditions.
+                        </p>
+                    </uib-accordion-group>
+
+                    <uib-accordion-group in-faq heading="My shell cannot host plugins, but I want to know if my plugins work!">
+                        <p>We provide an example shell at ~cs3214/bin/esh-gback that you may use
+                        </p>
+                    </uib-accordion-group>
+
+                </uib-accordion>
+            </faq>
+        </div>
+    </div>
+</div>

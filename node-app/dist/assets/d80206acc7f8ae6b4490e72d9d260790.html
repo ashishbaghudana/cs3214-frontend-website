@@ -1,0 +1,31 @@
+<style>
+    summary::-webkit-details-marker {
+        display: none;
+    }
+
+    details summary::before {
+        content: "►";
+    }
+
+    details[open] summary::before {
+        content: "▼"
+    }
+</style>
+<div class="row" ng-controller="TraceFilesController">
+    <div class="col-lg-12">
+        <h2>
+            Viewing the ShellTrace graphs for the execution on test {{test}}
+        </h2>
+        <h1>The nodes in white are executed by the shell (as both the parent and child have made the same calls before the fork).</h1>
+        <h1>The nodes in grey are the nodes executed by only the child.</h1>
+    </div>
+    <div class="col-lg-12" ng-repeat="f in files">
+        <details ng-if="f.file" open="{{true}}}">
+            <img ng-if='f.dot_str.data'
+                 ng-src='data:image/svg+xml;base64,{{ f.dot_str.data }}'/>
+            <summary>Show/Hide Image For <h2>{{f.name}}</h2></summary>
+        </details>
+
+    </div>
+
+</div>

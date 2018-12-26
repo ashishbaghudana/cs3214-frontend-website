@@ -1,0 +1,461 @@
+<div class="row">
+    <div class="col-lg-12">
+        <h2>Project 4 - Personal Secure Server</h2>
+        <div class="col-lg-10">
+            <div class="panel panel-success">
+                <div class="panel-heading">
+                    Project Information
+                </div>
+                <div class="panel-body">
+                    <ul>
+                        <li>Read the <a ng-href="projects/pserver-handout.pdf">Project Handout</a>.
+                        <li>
+                            <b>How to run the provided unit tests:</b>
+                            The unit tests will be ready April 25.
+                            <!--
+                            Use the program <code>server_unit_test.py</code> in ~cs3214/bin.
+                            -->
+                        </li>
+                        <li>URL to <a ng-href="https://git.cs.vt.edu/cs3214-staff/pserv">Git repository for base code</a>.
+                        </li>
+
+                        <li>Performance <a ui-sref="p4scoreboard">Scoreboard</a>.
+                            <b>Run rules:</b>
+                            <ul>
+                                <li>You must use the same executable that passes the correctness tests.</li>
+                                <li>Your executable should be tuned to run on one of the regular 20-core rlogin nodes (not fir or sourwood)</li>
+                                <li>Use an unloaded machine (check load average with uptime) - the driver will not do that.</li>
+                                <li>You must test over an actual Ethernet connection. Our nodes have a 10Gbps backplane.
+                                    Thus, the test script involves 2 steps: find one machine on which to run your server.
+                                    Run <code>server_bench.py</code> <strong>without</strong> a URL.  This will set up a root directory
+                                    for your server, copy files into it, and start it.
+                                    Then, run <code>server_bench.py</code> on a second machine, pointing it to your server on the first.
+                                    The second machine should not be overloaded, but our benchmarking program is powerful enough that the
+                                    2nd machine need not be entirely idle.
+                                </li>
+                                <li>You should test all 5 tests without restarting your server. However, if one test crashes your
+                                    server, you may exclude it by specifying the others using the -t option, e.g. <code>-t login40,doom100</code>.</li>
+                                <li>Logging is not required (this is somewhat unrealistic).  To facilitate that, the driver will pass the <code>-s</code>
+                                    (silent) flag to your server.  You may use this flag to suppress output to standard out.</li>
+                                <li>To share your results with others, use <code>sspostresults.py</code>.</li>
+                                <!--li>For more details, see the question in the FAQ "How does the benchmarking work?" and below.</li>
+                                <li>This is the first time we're doing this, so please share any problems you encounter right away!</li-->
+                            </ul>
+                        </li>
+
+                    </ul>
+<!--
+                    <div class="alert alert-info">
+                        To demo exercise 5, send an email.
+                        Click <a ng-href="#/ex5demo?pid={{user.name}}">here</a> to see your current demo state.
+                    </div>
+-->
+                    <div class="alert alert-info"><b>How to submit:</b> Submit using the <a href="#!/submissions">submission page</a> or from the command line via <code>submit.py</code>
+                        under <code>p4</code>.
+                    </div>
+                </div>
+            </div>
+        </div>
+<script type="text/ng-template" id="ipv6onlysketch">
+    // 'pinfo' obtained from getaddrinfo()
+    // do not dual-bind if this is an IPv6 address
+    if (pinfo->ai_family == AF_INET6) {
+        int on = 1;
+        if (setsockopt(s, IPPROTO_IPV6, IPV6_V6ONLY, (void *)&on, sizeof(on)) == -1)
+            perror("setsockopt");
+    }
+    // now bind(s, pinfo->ai_addr, ...)
+</script>
+<script type="text/ng-template" id="badserverloop">
+    while (1) { // server loop
+        int ipv4client = accept(ipv4socket, ....);
+        handleConnection (ipv4client);
+        int ipv6client = accept(ipv6socket, ....);
+        handleConnection (ipv6client);
+    }
+</script>
+        <div class="col-lg-10">
+            <faq faq-heading="Network Programming FAQ">
+                <uib-accordion close-others="oneAtATime">
+
+                    <uib-accordion-group in-faq heading="Do we really need to use the textbook author's RIO package?">
+                        <p><b>Update</b> As of Spring 2018, we would like you to use the base code we provide instead.
+                        <p>
+                        <p>The RIO package provides an I/O layer on top of sockets that provides two core pieces of
+                            functionality: handling short reads and buffering of read data.  If you don't use the
+                            RIO package, you will have to implement how to handle short reads yourselves for
+                            a correct implementation.  Implementing buffering, though commonly done as a performance
+                            optimization that reduces the number of read() system calls, is not necessary for correctness.
+                        </p>
+                    </uib-accordion-group>
+
+                    <uib-accordion-group in-faq heading="How can I verify that my server responds correctly to HTTP requests?">
+                        <p>Run it under strace.  You may wish to set '-s 1024' to be able to examine all
+                            data written/read.
+                        </p>
+                    </uib-accordion-group>
+
+                    <uib-accordion-group in-faq heading="How can I verify that my server handles persistent connections correctly?">
+                        <p>A simple trick is to use 'curl -v' and specify the same URL twice, as in:</p>
+                        <pre>
+$ <b>curl -v http://cs3214.cs.vt.edu:9011/loadavg http://cs3214.cs.vt.edu:9011/loadavg</b>
+* About to connect() to cs3214.cs.vt.edu port 9011
+*   Trying 128.173.41.123... connected
+* Connected to cs3214.cs.vt.edu (128.173.41.123) port 9011
+...
+Connection #0 to host cs3214.cs.vt.edu left intact
+* Re-using existing connection! (#0) with host cs3214.cs.vt.edu
+...
+Connection #0 to host cs3214.cs.vt.edu left intact
+* Closing connection #0
+</pre>
+                        <p>
+                            Look for the lines shown above.
+                        </p>
+                    </uib-accordion-group>
+
+                    <uib-accordion-group in-faq heading="How do I use valgrind/strace when running under the test harness?">
+                        <p>Your server may fail when executing the tests of the test harness in sequence.
+                            One way to debug such problems is by using wrappers for valgrind and strace. To do this,
+                            create files <code>swrapper</code> and <code>vwrapper</code> like so:
+                        </p>
+                        <pre>
+::::::::::::::
+swrapper
+::::::::::::::
+#!/bin/sh
+#
+# invoke strace, passing along any arguments
+strace -s 1024 -e network,read,write -ff -o stracelog ./sysstatd $*
+
+::::::::::::::
+vwrapper
+::::::::::::::
+#!/bin/sh
+#
+# invoke valgrind, passing along any arguments
+valgrind ./sysstatd $*
+</pre>
+                        <p>Make sure to make those scripts executable (<code>chmod +x ?wrapper</code>), then
+                            you can run the test harness via <code>server_unit_test.py -s ./vwrapper -o output</code>
+                            to see valgrind output in 'output' (respectively for swrapper).
+                        </p>
+                    </uib-accordion-group>
+
+                    <uib-accordion-group in-faq heading="Does the body of a HTTP response have to be terminated with \r\n?">
+                        <p>No. CRLF is used only to separate header lines (and to end the header).  The body
+                            consists of arbitrary content, which isn't necessarily line-oriented at all.
+                        </p>
+                    </uib-accordion-group>
+
+                    <uib-accordion-group in-faq heading="curl indicates that persistent connections work, but we still fail the test.">
+                        <p>A possible reason is that you append additional bytes beyond the number you announced in
+                            Content-Length.  curl skips whitespace when attempting to read a response. If the additional
+                            bytes you send are whitespace (such as \r\n), then curl will hide the problem.
+                        </p>
+                    </uib-accordion-group>
+
+                    <uib-accordion-group in-faq heading="Do we need to use select() (or poll())?">
+                        <p>To meet the basic requirements of the assignment, no.
+                            The only possible use I could see is if you wanted to implement
+                            a time-out feature without issuing a blocking read() call.
+                            In this case, you would call select() before read(), giving a read
+                            set that consists only of the file descriptor you're intending to
+                            read from. If select() times out without the file descriptor
+                            having become readable, you treat it as timeout. Otherwise, you perform
+                            a single read() call on the file descriptor which you know won't block.
+                        </p>
+                        <p>
+                            An alternative to that is the use of a timer and a signal,
+                            as shown <a href="/~cs3214/fall2010/gback/examples/networking/read_with_timeout.c">here</a>; although select() is likely the
+                            simpler solution.
+                        </p>
+                    </uib-accordion-group>
+
+                    <uib-accordion-group in-faq heading="If our server is supposed to handle multiple
+    clients simultaneously, do we need to bind() one (or multiple) sockets
+    to multiple ports?">
+                        <p>No. TCP uses a quadruple (src ip, src port, dst ip, dst port) to
+                            identify each connection, so different connections can go to the
+                            same dst port as long as the src ip or src port are different.
+                            You will obtain a socket that refers to a specific connection (i.e.,
+                            client with a specific src ip/src port pair) as the return
+                            value from the accept() call.
+                        </p>
+                    </uib-accordion-group>
+
+                    <!--
+                    <uib-accordion-group in-faq heading="In relay mode, do we need to call bind/listen/accept
+                        after we've connected to the relay server?">
+                    <p>No. You don't need to (and must not) call anything. After connecting,
+                    simply send your prefix, then start handling HTTP/1.1 requests on that
+                    same socket.</p>
+                    <p>
+                    A TCP connection is bidirectional, and subsequent to the handshake
+                    that establishes a connection, the TCP protocol has in fact no
+                    memory of who established it (the TCP client) and who accepted
+                    it (the TCP server).   It's like picking up a phone (or calling someone
+                    back on a phone) - once the phone
+                    call is in progress, both parties can speak and assume whichever
+                    roles are suited to their conversation.
+                    </p>
+
+                    <li><a name="10"></a><b>In relay mode, how do we bind to the (random) port assigned by the NAT gateway (hn1.cs.vt.edu)</b>
+                    <p>As discussed in question 9, you don't call bind() at all.  When you connect() to the relay server,
+                    the OS assigns a port to your connection on the machine from which you're connecting.  (It does
+                    this for all TCP clients that don't call bind() - the common case.)
+                    As the connection is established, the NAT gateway eavesdrops on the connection and records
+                    this port in a map alongside the (random) port it assigned for the outside to use.
+                    When the outside peer (in our case, the relay server) replies, it'll rewrite (translate)
+                    the packet and reinsert the original port number before forwarding the packet so that the
+                    so-translated packet can be dispatched to the proper connection when it arrives back
+                    at the machine where your server runs.
+                    </p>
+                    -->
+
+                    <uib-accordion-group in-faq heading="curl claims to speak HTTP/1.1, but does not send a Connection: close header!">
+                        <p>The use of the 'Connection: close' header to announce that no more or requests/responses are
+                            sent on an existing TCP connection is a courtesy, but not a requirement in HTTP/1.1.
+                            Both client and server are free to close the connection instead.  In fact, such closing is needed
+                            when a client and/or server opportunistically keeps a HTTP/1.1 connection open only to later realize
+                            that nothing more needs to be requested (in the client case) or that the connection needs to be
+                            closed, perhaps to avoid running out of file descriptors or ports (in the server case).
+                            For details, read <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec8.html">Section 8 of RFC 2616, particularly 8.1.4 Practical Considerations.</a>
+                        </p>
+                    </uib-accordion-group>
+
+                    <uib-accordion-group in-faq heading="Why do I get a SIGPIPE signal/why does writing to a socket fail with errno=EPIPE?">
+                        <p>According to write(2):
+                        </p>
+                        <pre>
+       EPIPE  fd  is  connected to a pipe or socket whose reading end is closed.  When this happens
+              the writing process will also receive a SIGPIPE  signal.   (Thus,  the  write  return
+              value is seen only if the program catches, blocks or ignores this signal.)
+</pre>
+                        <p>This means the client has closed its file descriptor and would be unable to read() the
+                            data sent through this connection.  Note that due to buffering and the internals of the TCP
+                            protocol, there may be a delay before EPIPE is returned.  When it is, you should stop trying to
+                            send data on that connection and close the fd.
+                        </p>
+                        <p>
+                            You can also disable this mechanism, but then you must make sure that you do not create
+                            runaway threads that repeatedly try to read from already closed sockets, waiting for responses that
+                            will never come.  Hence, use at your own risk.
+                            3 ways of doing that are
+                            discussed <a ng-href="http://stackoverflow.com/questions/108183/how-to-prevent-sigpipes-or-handle-them-properly">here</a>;
+                            they include ignoring SIGPIPE altogether, using <tt>send/recv</tt> with the <tt>MSG_NOSIGNAL</tt> flag,
+                            or using a setsockopt() (not on Linux, however) to turn off this behavior.
+                        </p>
+                    </uib-accordion-group>
+
+                    <uib-accordion-group in-faq heading="My server works with curl, but fails with the test harness.">
+                        <p>Before starting any tests, your test harness checks if your server is running by connecting,
+                            then disconnecting from it.  Your server must not crash when that happens (the book's tiny.c does).
+                            You'd detect that if, after accepting a client, the very first read()/recv() call returns 0,
+                            indicating EOF on that socket.  Make sure you handle this correctly.
+                        </p>
+                    </uib-accordion-group>
+
+                    <uib-accordion-group in-faq heading="How should we handle IPv6/protocol-independent programming?">
+                        <p>Handling both IPv6 and IPv4 clients is (surprisingly) complicated, even over a decade after
+                            the IPv6 programming model was developed.  Nevertheless, it's not acceptable for network
+                            programs today to be IPv4 only.
+                        </p>
+                        <p>The first consideration is that your code must work on a machine that has only a IPv4
+                            address, on machine that has only a global IPv6 address, and on a machine that has both.
+                            (We don't ask that you support link-local IPv6 addresses, which would actually require
+                            additional programming effort).  Thus, your program needs to learn which addresses are
+                            available on a given system. It uses getaddrinfo() for that, with AI_PASSIVE set, as shown
+                            in Drepper's
+                            <a href="http://www.akkadia.org/drepper/userapi-ipv6.html">Userlevel IPv6 Programming Introduction</a>.
+                        </p>
+                        <p>getaddrinfo() will return a list of addresses (typically one or two).  You need to use the
+                            addresses returned in a certain manner, described below.  First, note that there's (apparently)
+                            no guarantee as to the order in which the addresses are returned, as I note in
+                            this <a href="http://sourceware.org/ml/libc-help/2011-12/msg00000.html">email,</a> which
+                            contradicts the statement Drepper makes on his page. I believe Drepper may have wrongly
+                            interpreted RFC 3484, or couldn't convince the maintainers of libc for the major Linux distributions
+                            to accept his interpretation, but in any event, on our current CentOS 6/7 machines which have both global
+                            IPv4 (via NAT) and IPv6 connectivity, the IPv4 address is returned before the IPv6 address, contrary
+                            to Drepper's statement.
+                        </p>
+                        <p>There are two approaches of dealing with IPv4 and IPv6.  The first approach is to keep
+                            them separate.  Two separate sockets, separately bound via bind(), with separate calls to listen()
+                            and separate calls to accept().  Note that this approach requires multiple threads (or a
+                            form of I/O multiplexing such as select()/poll()), because you must avoid the following
+                            pitfall:
+                        </p>
+                        <div hljs include="'badserverloop'" language="c"> </div>
+                        <p>In the above loop, while we wait for an IPv4 client, we cannot accept and serve pending
+                            IPv6 clients, and vice versa.  Instead, you need one thread for IPv4 accept and one for
+                            IPv6 accept.  In this project, since you're using multiple threads anyway, implementing
+                            this may not be such a burden.</p>
+                        <p>The second approach is to use the so-called dual-bind feature.  This feature was
+                            introduced to make porting existing servers from IPv4 to IPv6 simpler by allowing the
+                            application to just use 1 socket to accept both IPv4 and IPv6 clients.
+                            This socket must be bound to the IPv6 address for this to work.  If a socket is dual-bound
+                            to IPv6/IPv4, a subsequent attempt to bind it to IPv4 will fail with EADDRINUSE.
+                            (And vice versa: if the IPv4 port is already bound to another socket, an attempt to
+                            dual-bind() to the IPv6 will fail with EADDRINUSE!)
+                        </p>
+                        <p>On most Linux systems, including ours, dual-bind is enabled by default for a socket.
+                            That is, if you bind the socket to IPv6, it'll automatically be bound to IPv6 and IPv4.
+                            There's an option to turn dual-bind off for a given socket.
+                            You must turn it off if you wish to use the two socket approach before calling bind(), like so:
+                        </p>
+                        <div hljs include="'ipv6onlysketch'" language="c"> </div>
+                        <p>So, in summary:
+                        </p>
+                        <p>
+                            Approach (1): exploit dual-bind.  Bind a single-socket, use a single thread to do the accept.
+                            Caveat: you can't assume the IPv6 address is before the IPv4 address in the list.
+                            Drepper's technique does not work on CentOS.  Keep in mind your code should still work
+                            on any configuration (IPv4-only, IPv6-only, dual-stack).  You may need to iterate through
+                            the returned list from getaddrinfo twice, first to detect if there's an IPv6 in there, and
+                            if so, bind to it first (and only to it), else bind to the IPv4.
+                            A drawback of this approach is that it will not work on systems that do not allow
+                            dual-binding, such as <a href="http://permalink.gmane.org/gmane.os.openbsd.ipv6/38">OpenBSD</a>.
+                        </p>
+                        <p>
+                            Approach (2): handle protocols separately, with two sockets.  You need 2 threads (could
+                            be tasks in your thread pool, but don't forget that they are long-running, so you'll want
+                            to increase the number of threads in the pool since 2 threads will be running the accept()
+                            loops).  And you need to avoid accidental dual-bind by explicitly turning on IPV6_V6ONLY
+                            for the socket you intend to bind to IPv6, and for that socket only.
+                        </p>
+                    </uib-accordion-group>
+
+                    <uib-accordion-group in-faq heading="Is supporting IPv6 really that complicated?">
+                        <p>
+                            As of the time of this writing, no simpler approach is known.
+                            In a Jan/2016 conversation with Steinar Gunderson, the lead implementor of <a href="https://sites.google.com/site/ipv6implementors/2010/agenda">Google's transition to IPv6 in 2010</a>, this lack of a universal method appeared to be confirmed.
+                        </p>
+                    </uib-accordion-group>
+
+                    <uib-accordion-group in-faq heading="Does the IPv6 code in the 3rd edition of the textbook work?">
+                        <p>Unfortunately, the 3rd edition of our textbook advocates the
+                            wrong method in its <a href="http://csapp.cs.cmu.edu/3e/ics3/code/src/csapp.c">open_listenfd()</a> method.
+                            To make matters worse, I am being credited with this wrong method in the <a href="http://csapp.cs.cmu.edu/3e/pieces/preface3e.pdf">book's preface</a>.
+                        </p>
+                    </uib-accordion-group>
+
+                    <uib-accordion-group in-faq heading="How does the benchmarking work?">
+                        <p>Benchmarking web servers is a <a href="https://www.mnot.net/blog/2011/05/18/http_benchmark_rules">surprisingly difficult task</a>,
+                            which was recognized as early as <a href="http://www.hpl.hp.com/techreports/98/HPL-98-61.pdf">1998</a>.
+                        </p>
+                        <p>In our approach, we use a tool called <a href="https://github.com/wg/wrk">wrk</a> by Will Glozer.
+                            This tool simulates n simultaneous clients that repeatedly access a URL over a separate persistent HTTP/1.1 connection, recording whether the request
+                            succeeded (with 200), failed (with a non-200 code), or timed out or incurred another error, such as a connection reset.
+                            wrk's scalable implementation ensures that the client does not become the bottleneck.  wrk then tabulates the results.
+                            For each successful request, it also records the latency, which it tabulates as well.
+                        </p>
+                        <p>
+                            There are multiple possible performance metrics for web servers: throughput measured in requests per seconds, throughput measured in bytes/second, and latency.
+                            Often, a <a href="https://www.mnot.net/blog/image/apache-worker.jpg">performance profile</a> is created: for instance, examining how the throughput changes with the number of concurrent
+                            connections (it should go up to a point and then not decay).  A related profile is that of latency: generally, as the number of concurrent
+                            connections increases, so will latency (up to the point where connections may time out).  Latency is often considered using percentiles and/or averages.
+                        </p>
+                        <p>We use multiple types of workloads for our benchmarking here and record requests per second, payload throughput in bytes/s, the number of errors, and the mean latency.
+                            The number of errors should stay zero (or small).
+                            You can read each workload's description by running <code>server_bench.py -l</code>.
+                            Some of the benchmarks are intended to make your server CPU bound, some of them will make your server network bound, and some will stress the behavior
+                            of your server when there is a large number of connections. (We use 10k here as large, although a server can probably handle up to 30k which is when
+                            the port space limitation becomes an issue.)
+                        </p>
+                        <p>Scott Pruett wrote a multi-threaded and event-based implementation of sysstatd whose results are posted on the scoreboard under spruett3.
+                            The 'demo' entry is the sample server running at <a href="http://cs3214.cs.vt.edu:9011/loadavg">cs3214.cs.vt.edu:9011/loadavg</a>, which is not implemented in C.
+                        </p>
+                        <p>
+                            A limitation of wrk is that it cannot keep a constant request rate (unlike when your server
+                            is <a href="http://www.urbandictionary.com/define.php?term=slashdotted">slashdotted</a>),
+                            rather, it backs up (delays sending the next request on a given connection) if the server cannot keep pace.
+                            We ignore this restriction here, but please recognize that wrk testing will say little
+                            about your server's behavior under realistic overloads.
+                            To the best of my knowledge, there is currently no tool that can reliably produce constant (and high) request rates.
+                            httperf does not work on recent OSs as it does not support epoll(). autobench relies on httperf.
+                            (Gil Tene's derived <a href="https://github.com/giltene/wrk2">wrk2</a> claims to support a constant request rate,
+                            though initial testing was not successful. We may revisit this in the future.)
+                        </p>
+
+                    </uib-accordion-group>
+
+<!--
+                    <uib-accordion-group in-faq heading="Can we cache the load average/meminfo?">
+                        For benchmarking purposes, you may cache this information, up to 100ms.
+                        That is, the load average your server reports must have been obtained from the kernel
+                        no earlier than 100ms ago.
+                        For the synthetic requests (e.g. /loadavg), an efficient HTTP
+                        implementation will in fact be dominated by the time it takes to retrieve this data from
+                        the kernel, so avoiding this using caching will provide tremendous speedup.
+                    </uib-accordion-group>
+-->
+
+                    <uib-accordion-group in-faq heading="Can we use libevent/libuv, etc.?">
+                        For the purposes of this assignment, which is to gain familiarity with low-level
+                        interfaces, no.  But you can implement your own epoll() loop.
+                    </uib-accordion-group>
+
+                    <uib-accordion-group in-faq heading="Can we use sendfile(2)?">
+                        Yes.
+                    </uib-accordion-group>
+
+                    <uib-accordion-group in-faq heading="How do I write a fast, multi-threaded, and event-based server?">
+                        <p>You will need to combine a number of techniques.  First, your server should be multi-threaded,
+                            but you will no longer dedicate threads to connections.  Rather, each thread will multiplex
+                            many connections.  To that end, each thread should maintain an <a href="http://man7.org/linux/man-pages/man7/epoll.7.html">epoll set</a>
+                            of file descriptors for which it is responsible.  Each thread then executes an event loop.  At the
+                            head of the loop, it will call epoll_wait().  In the body of the event loop, each ready file descriptor
+                            will need to be handled.  Handling a file descriptor here means to read() whatever data is available
+                            on it.  The data read needs to be processed.  Since there is no guarantee how much data is available,
+                            your processing should be state machine based so that it can remember how far in the processing of
+                            the HTTP request it got. Once the request is complete, the event handling thread would process it.
+                        </p>
+                        <p>
+                            You should probably use epoll() in level-triggered mode, which requires that you partition
+                            your file descriptors across worker threads so that exactly one worker thread handles all interactions
+                            on that file descriptor.
+                            It is probably also beneficial to separate your accepting file descriptors (and have a separate thread handle those)
+                            to avoid unnecessary latency.
+                        </p>
+                        <p>
+                            The strategies described so far will probably allow you to create a server that achieves high
+                            throughput in our benchmarking, but a real-world event-based server would need to go further.
+                            For instance, a real-world server would need to make sure that event threads are never blocked, which
+                            will require special handling when a thread is writing back responses to the client (which may block if
+                            the TCP pipeline is full).
+                            This would need to be handled by placing the socket in non-blocking mode, attempting to write, and
+                            then using epoll to continue the write when it is safe to do so.
+                            Furthermore, if a thread needed to contact other tiers (a database, for instance), any such
+                            processing's progress would need to be modeled using state machines.
+                            A real-world server would also require some form of load balancing to ensure that all threads
+                            handle roughly an equal number of connections.
+                        </p>
+                    </uib-accordion-group>
+
+<!--
+                    <uib-accordion-group in-faq heading="How do we pass the demo?">
+                        <a href="images/proj4demo.png">
+                            <img style="height: 400px" class="pull-right" src="images/proj4demo.png">
+                        </a>
+                        <p>First, make sure your server is stable enough to survive the interaction with a real browser.
+                            Visit your page, and hit reload several times.  Don't be gentle on your server.
+                            Observe the network panel in your browser.
+                            It should show 200 return codes for all requests.  Though not shown, this should also apply
+                            to requests to the synthetic services.  Do not request a demo if you see anything in red,
+                            or anything remaining (pending) while testing it out.
+                            Note, in particular, that the spinning threads must be spawned in the background.
+                        </p>
+                        <p>
+                            If your charts don't display, check a) that all served content has an appropriate content
+                            type (in particular, JavaScript, JSON-P, and style sheets), and that b)
+                            your <a href="http://stackoverflow.com/questions/2067472/what-is-jsonp-all-about">JSON-P</a> response
+                            is correct and in particular echos the callback argument correctly.
+                        </p>
+                    </uib-accordion-group>
+-->
+
+                </uib-accordion>
+            </faq>
+        </div>
+    </div>
+</div>

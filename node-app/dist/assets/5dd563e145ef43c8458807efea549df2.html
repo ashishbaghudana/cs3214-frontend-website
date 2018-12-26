@@ -1,0 +1,86 @@
+<style>
+    summary::-webkit-details-marker {
+        display: none;
+    }
+
+    details summary::before {
+        content: "►";
+    }
+
+    details[open] summary::before {
+        content: "▼"
+    }
+</style>
+
+<div class="row" ng-controller="TraceAnalysisPageController">
+    <div class="col-lg-12">
+        <h2>ShellTrace</h2>
+        <div class="col-lg-10">
+            <p>This page shows the ShellTrace analysis results for {{pid}}. The analysis is provided to aid in debugging
+                and
+                results of analysis tests does not effect your grade.</p>
+            <p>Any questions or comments can be directed to Eric Williamson at <a href="mailto:ericrw96@vt.edu">ericrw96@vt.edu</a>
+            </p>
+            <p>An explanation of this analysis can be found <a ui-sref="shelltrace">here</a></p>
+        </div>
+    </div>
+    <div class="col-md-12">
+        <!--ul>
+            <li ng-if="dynresult" ng-repeat="result in dynresult">
+                <div ng-if="result.files" ng-repeat="f in result.files">
+                    <img src="{{f}}.dot.svg"/>
+                </div>
+                {{result}}
+            </li>
+        </ul-->
+
+        <table class="table">
+            <tr>
+                <th>
+                    Test Name
+                </th>
+                <th>
+                    Status
+                </th>
+                <th>
+                    Errors
+                </th>
+                <th>
+                    Output
+                </th>
+                <th>
+                    View Trace Graphs
+                </th>
+            </tr>
+            <tr ng-class="{'danger':result.result=='FAIL', 'success':result.result=='PASS', 'warning':result.result=='WARNING'}"
+                ng-repeat="result in dynresult">
+                <th>{{result.test}}</th>
+                <th>{{result.result}}</th>
+                <th>
+                    <pre ng-if="result.error.message">{{result.error.message}}</pre>
+                    <div ng-if="!result.error.message">
+                        <div ng-if="result.error && !result.dot_str.data">
+                            {{result.error}}
+                        </div>
+                        <details ng-if="result.error && result.dot_str.data">
+                            <summary>{{result.error}}</summary>
+
+                            <img ng-if='result.dot_str.data'
+                                 ng-src='data:image/svg+xml;base64,{{ result.dot_str.data }}'/>
+                        </details>
+                    </div>
+                    <!--div> {{ result }}</div-->
+
+                </th>
+                <th>
+                    <pre style="white-space: pre-wrap; font-family:monospace;">
+{{result.output.data}}
+                    </pre>
+                </th>
+                <th>
+                    <a target="_blank" ng-click="viewFiles(result)">View Trace Files</a>
+                </th>
+            </tr>
+        </table>
+    </div>
+</div>
