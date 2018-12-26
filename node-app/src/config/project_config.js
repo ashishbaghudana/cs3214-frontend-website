@@ -15,11 +15,11 @@ let projectConfig = {
             {
                 label : "Projects",
                 entries: [
-                    { path: '/projects', label: "Project Due Dates", templateUrl: projectspartial },
-                    { path: '/project1', label: "Project 1", templateUrl: project1partial },
-                    { path: '/project2', label: "Project 2", templateUrl: project2partial },
-                    { path: '/project3', label: "Project 3", templateUrl: project3partial },
-                    { path: '/project4', label: "Project 4", templateUrl: project4partial },
+                    { path: '/projects', label: "Project Due Dates", templateUrl: projectspartial, disabled: true },
+                    { path: '/project1', label: "Project 1", templateUrl: project1partial, disabled: true },
+                    { path: '/project2', label: "Project 2", templateUrl: project2partial, disabled: true },
+                    { path: '/project3', label: "Project 3", templateUrl: project3partial, disabled: true },
+                    { path: '/project4', label: "Project 4", templateUrl: project4partial, disabled: true },
 
                 ]
             },
