@@ -18,7 +18,7 @@ nvm install node
 
 ### Semester Setup
 
-The web application is configured using a JSON file that is placed within the directory `/home/courses/cs3214/admin/submissions/configurationFiles`. There are several fields in configuration file, including the semester name, TAs, lectures, and other documents. See the `config/` folder for more information.
+The web application is configured using a JSON file that is placed within the directory `/home/courses/cs3214/admin/submissions/configurationFiles`. The file should be named as per the semester i.e. for Spring 2019, the file should be called `spring2019.json`. There are several fields in configuration file, including the semester name, TAs, lectures, and other documents. See the `config/` folder for more information.
 
 ## Node Application Setup
 
