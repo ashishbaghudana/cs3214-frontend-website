@@ -15,7 +15,9 @@ EXCLUDE_LIST = [
     "./node-app/src/projects/project2.html",
     "./node-app/src/projects/project4.html",
     "./node-app/SEMESTER_SETUP.md",
-    "./setup_semester.py"
+    "./setup_semester.py",
+    "./config/semester_format.json5",
+    "./config/spring2019.json"
 ]
 
 

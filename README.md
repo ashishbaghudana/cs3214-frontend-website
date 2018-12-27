@@ -16,6 +16,10 @@ nvm --version
 nvm install node
 ```
 
+### Semester Setup
+
+The web application is configured using a JSON file that is placed within the directory `/home/courses/cs3214/admin/submissions/configurationFiles`. There are several fields in configuration file, including the semester name, TAs, lectures, and other documents. See the `config/` folder for more information.
+
 ## Node Application Setup
 
 Setting up the application is straightforward. Navigate to the `node-app/` folder and use npm to install dependencies and run webpack.

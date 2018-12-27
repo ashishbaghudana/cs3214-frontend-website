@@ -4,4 +4,4 @@
 
 Edit the semester configuration and place it in `/home/courses/cs3214/admin/submissions/configurationFiles`.
 
-The current semester (Spring 2019) configuration is also placed here as a sample.
+The current semester (Spring-2019) configuration is also placed here as a sample.
