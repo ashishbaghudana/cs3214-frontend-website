@@ -2,6 +2,14 @@
 
 This repository contains setup scripts for CS3214 website. The website is built using AngularJS and is a static website. Configuration changes to the website are done via a JSON file. Projects and exercises can be enabled or disabled via the static configuration. Redeployment of the website is required every time the configuration changes.
 
+In order to set up the entire website from scratch, follow the steps below in the order:
+
+* Pre-requisites
+  * Setup semester specific routes: `python setup_semester.py`
+  * [Installation of NVM](https://github.com/ashishbaghudana/cs3214-frontend-website#node-virtual-manager)
+  * [Semester Configuration](https://github.com/ashishbaghudana/cs3214-frontend-website#semester-setup)
+* [Node Application Setup](https://github.com/ashishbaghudana/cs3214-frontend-website#node-application-setup)
+
 ## Pre-requisites and Semester Setup
 
 Use the Python script `setup_semester.py` to setup files for each semester. The script does a recursive grep for any pattern that matches `(spring|fall)\d+` and `(Spring |Fall )\d+` and replaces that with the current semester.
@@ -26,6 +34,7 @@ Setting up the application is straightforward. Navigate to the `node-app/` folde
 
 ```
 cd node-app
+nvm use node
 npm install
 npm run build
 ./publish.sh
