@@ -14,6 +14,12 @@ In order to set up the entire website from scratch, follow the steps below in th
 
 Use the Python script `setup_semester.py` to setup files for each semester. The script does a recursive grep for any pattern that matches `(spring|fall)\d+` and `(Spring |Fall )\d+` and replaces that with the current semester.
 
+Run this using the command
+
+```
+python setup_semester.py
+```
+
 ### Node Virtual Manager
 
 We use nvm to manage npm and nodejs installations. The website is tested with node v11.4.0 and npm v6.4.1.
