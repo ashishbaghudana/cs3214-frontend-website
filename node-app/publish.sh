@@ -14,4 +14,3 @@ for folder in assets documents exercises images lectures projects; do
   fi
   cp -r dist/$folder/* $PUBLISH_DIR/$folder
 done
-

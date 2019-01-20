@@ -1,0 +1,318 @@
+{
+	"BASEPATH": "/home/courses/cs3214/admin/submissions/spring2019/",
+	"ADMINS": [
+		"butta",
+		"ashishb"
+	],
+	"JUDGES": [
+		"admin0"
+	],
+	"projecttargets": {
+		"analysis": {
+			"suffix": "tar"
+		},
+		"analysis-trace": {
+			"suffix": "tar"
+		},
+		"ex1": {
+			"desc": "Exercise 1 dpipe",
+			"duedate": "TBD",
+			"maxlatedays": 0,
+			"suffix": "tar",
+			"submissiondetails": "Submit your tarfile for grading ex1",
+			"exercise": true,
+      "enabled": true
+		},
+		"ex2": {
+			"desc": "Exercise 2",
+			"duedate": "TBD",
+			"maxlatedays": 0,
+			"suffix": "tar",
+			"submissiondetails": "Submit a tarfile containing answers.txt and your q1 source files. Please do not have extra files in the tarfile.",
+			"exercise": true,
+      "enabled": false
+		},
+		"ex3": {
+			"desc": "Exercise 3 outfoxed",
+			"duedate": "TBD",
+			"maxlatedays": 0,
+			"suffix": "c",
+			"submissiondetails": "Submit your outfoxed.c file only",
+			"exercise": true,
+      "enabled": false
+		},
+		"ex4": {
+			"desc": "Exercise 4",
+			"duedate": "TBD",
+			"maxlatedays": 0,
+			"suffix": "tar",
+			"submissiondetails": "Submit your tarfile that follows the spec.",
+			"exercise": true,
+      "enabled": false
+		},
+		"p1": {
+			"desc": "Esh",
+			"duedate": "TBD",
+			"maxlatedays": 4,
+			"suffix": "tar",
+			"submissiondetails": "Please submit your tarfile containing your src directory, README.txt, and partner.json",
+			"project": true,
+      "enabled": false
+		},
+		"p2": {
+			"desc": "Threadpool",
+			"duedate": "TBD",
+			"maxlatedays": 4,
+			"suffix": "tar",
+			"submissiondetails": "Please submit your tarfile containing partner.json, threadpool.c, threadpool.pdf",
+			"project": true,
+      "enabled": false
+		},
+		"p3": {
+			"desc": "Malloc",
+			"duedate": "TBD",
+			"maxlatedays": 4,
+			"suffix": "c",
+			"submissiondetails": "submit mm.c",
+			"project": true,
+                        "enabled": false
+		},
+		"p4": {
+			"desc": "Project 4",
+			"duedate": "TBD",
+			"maxlatedays": 0,
+			"suffix": "tar",
+			"submissiondetails": "Submit your tarfile that follows the spec.",
+			"project": true,
+      "enabled": false
+		},
+		"p3-ex": {
+			"suffix": "c",
+			"duedate": "TBD",
+      "enabled": false
+		},
+		"p4-ex": {
+			"suffix": "NA",
+			"duedate": "TBD",
+      "enabled": false
+		}
+	},
+	"semester": "Spring 2019",
+	"syllabus": "#",
+	"finallettergrades": "",
+	"hostpath": "/web/courses/cs3214/spring2019",
+	"staff": {
+		"desc": [{
+				"heading": "Name",
+				"key": "name"
+			},
+			{
+				"heading": "Email",
+				"key": "email"
+			},
+			{
+				"heading": "Role",
+				"key": "role"
+			},
+			{
+				"heading": "Office Hours",
+				"key": "hours"
+			}
+		],
+		"members": [{
+				"name": "Ashish Baghudana",
+				"email": "ashishb@vt.edu",
+				"role": "GTA",
+				"hours": "TBD",
+				"image": "pictures/Ashish.jpg"
+			},
+			{
+				"name": "Prof. Ali Butt",
+				"email": "butta@cs.vt.edu",
+				"role": "Instructor",
+				"hours": "TBD",
+				"image": ""
+			}
+		]
+	},
+	"exams": {
+		"midtermA": {
+			"annurl": "#",
+			"solurl": "#",
+			"announcement": "Midterm A"
+		},
+		"midtermB": {
+			"annurl": "#",
+			"solurl": "#",
+			"announcement": "Midterm B"
+		},
+		"final": {
+			"annurl": "#",
+			"solurl": "#",
+			"announcement": "Final"
+		}
+	},
+	"sampleexams": [{
+			"desc": "Midterm Fall 2009",
+			"url": "documents/SampleMidtermCS3214F09.pdf"
+		},
+		{
+			"desc": "Final Fall 2009",
+			"url": "documents/SampleFinalCS3214F09.pdf"
+		},
+		{
+			"desc": "Midterm Spring 2010",
+			"url": "documents/SampleMidtermCS3214S10.pdf"
+		},
+		{
+			"desc": "Final Spring 2010",
+			"url": "documents/SampleFinalCS3214S10.pdf"
+		},
+		{
+			"desc": "Midterm Fall 2010",
+			"url": "documents/SampleMidtermCS3214F10.pdf"
+		},
+		{
+			"desc": "Final Fall 2010",
+			"url": "documents/SampleFinalCS3214F10.pdf"
+		},
+		{
+			"desc": "Midterm Fall 2011",
+			"url": "documents/SampleMidtermCS3214F11.pdf"
+		},
+		{
+			"desc": "Final Fall 2011",
+			"url": "documents/SampleFinalCS3214F11.pdf"
+		},
+		{
+			"desc": "Midterm Fall 2014",
+			"url": "documents/SampleMidtermCS3214F14.pdf"
+		},
+		{
+			"desc": "Final Fall 2014",
+			"url": "documents/SampleFinalCS3214F14.pdf"
+		},
+		{
+			"desc": "Midterm Fall 2015",
+			"url": "documents/SolnMidtermAFall2015.pdf"
+		},
+		{
+			"desc": "Midterm A Fall 2016",
+			"url": "documents/SolnMidtermAFall2016.pdf"
+		},
+		{
+			"desc": "Midterm B Fall 2016",
+			"url": "documents/SolnMidtermBFall2016.pdf"
+		},
+		{
+			"desc": "Midterm Spring 2016",
+			"url": "documents/SampleMidtermCS3214S16.pdf"
+		},
+		{
+			"desc": "Final Spring 2016",
+			"url": "documents/SampleFinalCS3214S16.pdf"
+		}
+	],
+	"lectures": [{
+			"desc": "Course Introduction",
+			"urlpdf": "Course-Introduction.pdf",
+			"urlpptx": "Course-Introduction.pptx"
+		},
+		{
+			"desc": "Introduction to Processes",
+			"urlpdf": "Lecture-Intro-To-Processes.pdf",
+			"urlpptx": "Lecture-Intro-To-Processes.pptx",
+			"reading": "Ch. 8"
+		},
+		{
+			"desc": "Linking and Loading",
+			"urlpdf": "Lecture-Linking.pdf",
+			"urlpptx": "Lecture-Linking.pptx",
+			"reading": "Ch. 7"
+		},
+		{
+			"desc": "Multi-Threading, Introduction",
+			"urlpdf": "Lecture-Multithreading.pdf",
+			"urlpptx": "Lecture-Multithreading.pptx",
+			"reading": "Ch. 12"
+		},
+		{
+			"desc": "Multi-Threading, Locking",
+			"urlpdf": "Lecture-Multithreading-Locking.pdf",
+			"urlpptx": "Lecture-Multithreading-Locking.pptx",
+			"reading": ""
+		},
+		{
+			"desc": "Multi-Threading, Semaphores and Condition Variables",
+			"urlpdf": "Lecture-Multithreading-Semaphores-ConditionVariables.pdf",
+			"urlpptx": "Lecture-Multithreading-Semaphores-ConditionVariables.pptx",
+			"reading": ""
+		},
+		{
+			"desc": "Multi-Threading, on Deadlock",
+			"urlpdf": "Lecture-Deadlock.pdf",
+			"urlpptx": "Lecture-Deadlock.pptx",
+			"reading": ""
+		},
+		{
+			"desc": "Supplementary Material: Standard I/O",
+			"urlpdf": "Supplementary-standard-IO.pdf",
+			"urlpptx": "Supplementary-standard-IO.pptx",
+			"reading": "Ch. 10"
+		},
+		{
+			"desc": "Memory Management, Dynamic Memory Allocation",
+			"urlpdf": "Lecture-MemoryAllocation.pdf",
+			"urlpptx": "Lecture-MemoryAllocation.pptx",
+			"reading": "Ch. 9.9, 9.11"
+		},
+		{
+			"desc": "Memory Management, Automatic MM and GC",
+			"urlpdf": "Lecture-AutomaticMemoryManagement.pdf",
+			"urlpptx": "Lecture-AutomaticMemoryManagement.pptx",
+			"reading": "Ch. 9.10"
+		},
+		{
+			"desc": "Virtual Memory",
+			"urlpdf": "Lecture-VirtualMemory.pdf",
+			"urlpptx": "Lecture-VirtualMemory.pptx",
+			"reading": "rest of Ch. 9"
+		},
+		{
+			"desc": "Networking - Introduction",
+			"urlpdf": "Lecture-NetworkingIntroduction.pdf",
+			"urlpptx": "Lecture-NetworkingIntroduction.pptx",
+			"reading": "Ch. 13"
+		},
+		{
+			"desc": "Networking - Socket Programming",
+			"urlpdf": "Lecture-NetworkingSocketProgramming.pdf",
+			"urlpptx": "Lecture-NetworkingSocketProgramming.pptx"
+		},
+		{
+			"desc": "Networking - HTTP, Variance in systems",
+			"urlpdf": "Lecture-NetworkingHttp.pdf",
+			"urlpptx": "Lecture-NetworkingHttp.pptx"
+		},
+		{
+			"desc": "Networking - HTTP, uses and server models",
+			"urlpdf": "Lecture-NetworkingHttpUsesAndServerModels.pdf",
+			"urlpptx": "Lecture-NetworkingHttpUsesAndServerModels.pptx"
+		},
+		{
+			"desc": "Virtualization",
+			"urlpdf": "Lecture-Virtualization.pdf",
+			"urlpptx": "Lecture-Virtualization.pptx"
+		},
+		{
+			"desc": "Security",
+			"urlpdf": "Lecture-Security.pdf",
+			"urlpptx": "Lecture-Security.pptx"
+		},
+		{
+			"desc": "Supplementary Management: NAT Traversal",
+			"urlpdf": "Supplementary-networking-nat-ipv4.pdf",
+			"urlpptx": "Supplementary-networking-nat-ipv4.pptx"
+		}
+	]
+}

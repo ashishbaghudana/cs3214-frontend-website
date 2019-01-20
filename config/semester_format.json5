@@ -1,0 +1,324 @@
+{
+  // Base directory for submissions (Required)
+  BASEPATH: "/home/courses/cs3214/admin/submissions/spring2019/",
+  // Path to CSV for exams (Optional)
+  // See exam-scores.example.csv for a sample CSV file
+  EXAM_CSV_FILE_TEMPLATE: "%s/exams/cs3214-spring2019-examscores.csv",
+  // List of admins for the website (Required)
+  ADMINS: [
+    "ashishb",
+  ],
+  // Username for the judge
+  JUDGES: [
+    "admin0",
+  ],
+  // Retain this as it is for most part
+  // Change the due dates
+  projecttargets: {
+    "analysis": {
+      suffix: "tar"
+    },
+    "analysis-trace": {
+      suffix: "tar"
+    },
+    "ex1": {
+      desc: "Exercise 1 dpipe",
+      duedate: "02/04/2018 23:59",
+      maxlatedays: 0,
+      suffix: "tar",
+      submissiondetails: "Submit your tarfile for grading ex1",
+      exercise: true,
+      // Enable or disable the ex/project appearing in the dropdown
+      enabled: true
+    },
+    "ex2": {
+      desc: "Exercise 2",
+      duedate: " 02/25/2018 23:59",
+      maxlatedays: 0,
+      suffix: "tar",
+      submissiondetails: "Submit a tarfile containing answers.txt and your q1 source files. Please do not have extra files in the tarfile.",
+      exercise: true,
+      enabled: true
+    },
+    "ex3": {
+      desc: "Exercise 3 outfoxed",
+      duedate: "03/11/2018 23:59",
+      maxlatedays: 0,
+      suffix: "c",
+      submissiondetails: "Submit your outfoxed.c file only",
+      exercise: true,
+      enabled: true
+    },
+    "ex4": {
+      desc: "Exercise 4",
+      duedate: "04/16/2018 23:59",
+      maxlatedays: 0,
+      suffix: "tar",
+      submissiondetails: "Submit your tarfile that follows the spec.",
+      exercise: true,
+      enabled: true
+    },
+    "p1": {
+      desc: "Esh",
+      duedate: "02/18/2018 23:59",
+      maxlatedays: 4,
+      suffix: "tar",
+      submissiondetails: "Please submit your tarfile containing your src directory, README.txt, and partner.json",
+      project: true,
+      enabled: true
+    },
+    "p2": {
+      desc: "Threadpool",
+      duedate: "03/25/2018 23:59",
+      maxlatedays: 4,
+      suffix: "tar",
+      submissiondetails: "Please submit your tarfile containing partner.json, threadpool.c, threadpool.pdf",
+      project: true,
+      enabled: true
+    },
+    "p3": {
+      desc: "Malloc",
+      duedate: "04/15/2018 23:59",
+      maxlatedays: 4,
+      suffix: "c",
+      submissiondetails: "submit mm.c",
+      project: true,
+      enabled: true
+    },
+    "p4": {
+      desc: "Project 4",
+      duedate: "05/02/2018 23:59",
+      maxlatedays: 0,
+      suffix: "tar",
+      submissiondetails: "Submit your tarfile that follows the spec.",
+      project: true,
+      enabled: true
+    },
+    "p3-ex": {
+      suffix: "c",
+      duedate: "04/15/2018 23:59",
+      enabled: true
+    },
+    "p4-ex": {
+      suffix: "NA",
+      duedate: "05/02/2018 23:59",
+      enabled: true
+    }
+  },
+  // Semester information (Required)
+  semester: "Spring 2019",
+  // Path to syllabus (Required)
+  syllabus: "documents/CS3214-Syllabus-Spring19.pdf",
+  // Path to final letter grade distribution
+  finallettergrade: "documents/CS3214-Final-Letter-Grades-Spring19.pdf",
+  // Path to web directory for the semester
+  hostpath: "/web/courses/cs3214/spring2019",
+  // Staff details
+  staff: {
+    desc: [
+      {
+        heading: "Name",
+        key: "name"
+      },
+      {
+        heading: "Email",
+        key: "email"
+      },
+      {
+        heading: "Role",
+        key: "role"
+      },
+      {
+        heading: "Office Hours",
+        key: "hours"
+      }
+    ],
+    members: [
+      {
+        name: "Ashish Baghudana",
+        email: "ashishb@vt.edu",
+        role: "GTA",
+        hours: "M 4:00 PM - 6:00PM\nT 5:30 PM - 7:30 PM",
+        // Path to image for the TA/Instructor
+        image: "images/20170829_195212.jpg"
+      }
+    ]
+  },
+  // Exams Details
+  exams: {
+    // Can also be midterm1, midterm2, or final
+    midterm: {
+      // Path to Announcement
+      annurl: "documents/CS3214-MidtermAnnounce-Spring18.pdf",
+      // Path to Solution
+      solurl: "documents/MidtermCS3214S18Solutions.pdf",
+      announcement: "Midterm Exam Announcement"
+    }
+  },
+  // Sample exams and their solutions
+  sampleexams: [
+    {
+      desc: "Midterm Fall 2009",
+      url: "documents/SampleMidtermCS3214F09.pdf"
+    },
+    {
+      desc: "Final Fall 2009",
+      url: "documents/SampleFinalCS3214F09.pdf"
+    },
+    {
+      desc: "Midterm Spring 2010",
+      url: "documents/SampleMidtermCS3214S10.pdf"
+    },
+    {
+      desc: "Final Spring 2010",
+      url: "documents/SampleFinalCS3214S10.pdf"
+    },
+    {
+      desc: "Midterm Fall 2010",
+      url: "documents/SampleMidtermCS3214F10.pdf"
+    },
+    {
+      desc: "Final Fall 2010",
+      url: "documents/SampleFinalCS3214F10.pdf"
+    },
+    {
+      desc: "Midterm Fall 2011",
+      url: "documents/SampleMidtermCS3214F11.pdf"
+    },
+    {
+      desc: "Final Fall 2011",
+      url: "documents/SampleFinalCS3214F11.pdf"
+    },
+    {
+      desc: "Midterm Fall 2014",
+      url: "documents/SampleMidtermCS3214F14.pdf"
+    },
+    {
+      desc: "Final Fall 2014",
+      url: "documents/SampleFinalCS3214F14.pdf"
+    },
+    {
+      desc: "Midterm Fall 2015",
+      url: "documents/SolnMidtermAFall2015.pdf"
+    },
+    {
+      desc: "Midterm A Fall 2016",
+      url: "documents/SolnMidtermAFall2016.pdf"
+    },
+    {
+      desc: "Midterm B Fall 2016",
+      url: "documents/SolnMidtermBFall2016.pdf"
+    },
+    {
+      desc: "Midterm Spring 2016",
+      url: "documents/SampleMidtermCS3214S16.pdf"
+    },
+    {
+      desc: "Final Spring 2016",
+      url: "documents/SampleFinalCS3214S16.pdf"
+    }
+  ],
+  // Lectures
+  lectures: [
+    {
+      desc: "Course Introduction",
+      urlpdf: "Course-Introduction.pdf",
+      urlpptx: "Course-Introduction.pptx"
+    },
+    {
+      desc: "Introduction to Processes",
+      urlpdf: "Lecture-Intro-To-Processes.pdf",
+      urlpptx: "Lecture-Intro-To-Processes.pptx",
+      reading: "Ch. 8"
+    },
+    {
+      desc: "Linking and Loading",
+      urlpdf: "Lecture-Linking.pdf",
+      urlpptx: "Lecture-Linking.pptx",
+      reading: "Ch. 7"
+    },
+    {
+      desc: "Multi-Threading, Introduction",
+      urlpdf: "Lecture-Multithreading.pdf",
+      urlpptx: "Lecture-Multithreading.pptx",
+      reading: "Ch. 12"
+    },
+    {
+      desc: "Esh Analysis",
+      urlpdf: "Lecture-Eric.pdf",
+      reading: ""
+    },
+    {
+      desc: "Multi-Threading, Locking",
+      urlpdf: "Lecture-Multithreading-Locking.pdf",
+      urlpptx: "Lecture-Multithreading-Locking.pptx",
+      reading: ""
+    },
+    {
+      desc: "Multi-Threading, Semaphores and Condition Variables",
+      urlpdf: "Lecture-Multithreading-Semaphores-ConditionVariables.pdf",
+      urlpptx: "Lecture-Multithreading-Semaphores-ConditionVariables.pptx",
+      reading: ""
+    },
+    {
+      desc: "Multi-Threading, on Deadlock",
+      urlpdf: "Lecture-Deadlock.pdf",
+      urlpptx: "Lecture-Deadlock.pptx",
+      reading: ""
+    },
+    {
+      desc: "Memory Management, Dynamic Memory Allocation",
+      urlpdf: "Lecture-MemoryAllocation.pdf",
+      urlpptx: "Lecture-MemoryAllocation.pptx",
+      reading: "Ch. 9.9, 9.11"
+    },
+    {
+      desc: "Memory Management, Automatic MM and GC",
+      urlpdf: "Lecture-AutomaticMemoryManagement.pdf",
+      urlpptx: "Lecture-AutomaticMemoryManagement.pptx",
+      reading: "Ch. 9.10"
+    },
+    {
+      desc: "Virtual Memory",
+      urlpdf: "Lecture-VirtualMemory.pdf",
+      urlpptx: "Lecture-VirtualMemory.pptx",
+      reading: "rest of Ch. 9"
+    },
+    {
+      desc: "Networking - Introduction",
+      urlpdf: "Lecture-NetworkingIntroduction.pdf",
+      urlpptx: "Lecture-NetworkingIntroduction.pptx",
+      reading: "Ch. 11"
+    },
+    {
+      desc: "Networking - Socket Programming",
+      urlpdf: "Lecture-NetworkingSocketProgramming.pdf",
+      urlpptx: "Lecture-NetworkingSocketProgramming.pptx"
+    },
+    {
+      desc: "Networking - HTTP",
+      urlpdf: "Lecture-NetworkingHttp.pdf",
+      urlpptx: "Lecture-NetworkingHttp.pptx"
+    },
+    {
+      desc: "Networking - HTTP, uses and server models",
+      urlpdf: "Lecture-NetworkingHttpUsesAndServerModels.pdf",
+      urlpptx: "Lecture-NetworkingHttpUsesAndServerModels.pptx"
+    },
+    {
+      desc: "Virtualization",
+      urlpdf: "Lecture-Virtualization.pdf",
+      urlpptx: "Lecture-Virtualization.pptx"
+    },
+    {
+      desc: "Security",
+      urlpdf: "Lecture-Security.pdf",
+      urlpptx: "Lecture-Security.pptx"
+    },
+    {
+      desc: "Supplementary Management: NAT Traversal",
+      urlpdf: "Supplementary-networking-nat-ipv4.pdf",
+      urlpptx: "Supplementary-networking-nat-ipv4.pptx"
+    }
+  ]
+}
