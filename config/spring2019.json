@@ -58,7 +58,7 @@
       "suffix": "tar",
       "submissiondetails": "Please submit your tarfile containing your src directory, README.txt, and partner.json",
       "project": true,
-      "enabled": false
+      "enabled": true
     },
     "p2": {
       "desc": "Threadpool",
